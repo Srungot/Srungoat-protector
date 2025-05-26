@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
@@ -46,11 +46,11 @@
     This is a custom license and is not OSI-approved.
 */
 
-#define JUNK_ON_OBF 1  
+#define JUNK_ON_OBF 0  
 #define JUNK_ON_OBF_LEVEL 1          
 #define Name_Of_Sections_watermark ".1337"
 #define FAKE_SIGNATURES 1
-#define CALL_LEVEL 1      
+#define CALL_LEVEL 0  
 
 #ifdef _MSC_VER
     #define SECTION(x) __declspec(allocate(x))
@@ -77,7 +77,7 @@ struct REMOTE_PE_HEADER : PE_HEADER {
     ULONG_PTR remoteBaseAddress;
 };
 
-#if FAKE_SIGNATURES  // taked here https://github.com/ac3ss0r/obfusheader.h/tree/main thank you ac3ss0r
+#if FAKE_SIGNATURES         // taked here https://github.com/ac3ss0r/obfusheader.h/tree/main thank you ac3ss0r
     #ifdef _MSC_VER
         #pragma section(".arch", read)
         #pragma section(".srdata", read)
@@ -90,13 +90,227 @@ struct REMOTE_PE_HEADER : PE_HEADER {
         #pragma section(".enigma1", read)
         #pragma section(".enigma2", read)
         #pragma section(".dsstext", read)
+        #pragma section(".NIGGER", read)
+        #pragma section(".NIGGER1", read)
+        #pragma section(".NIGGER2", read)
+        #pragma section(".NIGGER3", read)
+        #pragma section(".NIGGER4", read)
+        #pragma section(".NIGGER5", read)
+        #pragma section(".SEC_0x1A", read)
+        #pragma section(".SEC_0x2B", read)
+        #pragma section(".SEC_0x3C", read)
+        #pragma section(".SEC_0x4D", read)
+        #pragma section(".SEC_0x5E", read)
+        #pragma section(".SEC_0x6F", read)
+        #pragma section(".SEC_0x7G", read)
+        #pragma section(".SEC_0x8H", read)
+        #pragma section(".SEC_0x9I", read)
+        #pragma section(".SEC_0x10J", read)
+        #pragma section(".SEC_0x11K", read)
+        #pragma section(".SEC_0x12L", read)
+        #pragma section(".SEC_0x13M", read)
+        #pragma section(".SEC_0x14N", read)
+        #pragma section(".SEC_0x15O", read)
+        #pragma section(".SEC_0x16P", read)
+        #pragma section(".SEC_0x17Q", read)
+        #pragma section(".SEC_0x18R", read)
+        #pragma section(".SEC_0x19S", read)
+        #pragma section(".SEC_0x20T", read)
+        #pragma section(".SEC_0x21U", read)
+        #pragma section(".SEC_0x22V", read)
+        #pragma section(".SEC_0x23W", read)
+        #pragma section(".SEC_0x24X", read)
+        #pragma section(".SEC_0x25Y", read)
+        #pragma section(".SEC_0x26Z", read)
+        #pragma section(".SEC_0x27AA", read)
+        #pragma section(".SEC_0x28AB", read)
+        #pragma section(".SEC_0x29AC", read)
+        #pragma section(".SEC_0x30AD", read)
+        #pragma section(".SEC_0x31AE", read)
+        #pragma section(".SEC_0x32AF", read)
+        #pragma section(".SEC_0x33AG", read)
+        #pragma section(".SEC_0x34AH", read)
+        #pragma section(".SEC_0x35AI", read)
+        #pragma section(".SEC_0x36AJ", read)
+        #pragma section(".SEC_0x37AK", read)
+        #pragma section(".SEC_0x38AL", read)
+        #pragma section(".SEC_0x39AM", read)
+        #pragma section(".SEC_0x40AN", read)
+        #pragma section(".SEC_0x41AO", read)
+        #pragma section(".SEC_0x42AP", read)
+        #pragma section(".SEC_0x43AQ", read)
+        #pragma section(".SEC_0x44AR", read)
+        #pragma section(".SEC_0x45AS", read)
+        #pragma section(".SEC_0x46AT", read)
+        #pragma section(".SEC_0x47AU", read)
+        #pragma section(".SEC_0x48AV", read)
+        #pragma section(".SEC_0x49AW", read)
+        #pragma section(".SEC_0x50AX", read)
+        #pragma section(".SEC_0x51AY", read)
+        #pragma section(".SEC_0x52AZ", read)
+        #pragma section(".SEC_0x53BA", read)
+        #pragma section(".SEC_0x54BB", read)
+        #pragma section(".SEC_0x55BC", read)
+        #pragma section(".SEC_0x56BD", read)
+        #pragma section(".SEC_0x57BE", read)
+        #pragma section(".SEC_0x58BF", read)
+        #pragma section(".SEC_0x59BG", read)
+        #pragma section(".SEC_0x60BH", read)
+        #pragma section(".SEC_0x61BI", read)
+        #pragma section(".SEC_0x62BJ", read)
+        #pragma section(".SEC_0x63BK", read)
+        #pragma section(".SEC_0x64BL", read)
+        #pragma section(".SEC_0x65BM", read)
+        #pragma section(".SEC_0x66BN", read)
+        #pragma section(".SEC_0x67BO", read)
+        #pragma section(".SEC_0x68BP", read)
+        #pragma section(".SEC_0x69BQ", read)
+        #pragma section(".SEC_0x70BR", read)
+        #pragma section(".SEC_0x71BS", read)
+        #pragma section(".SEC_0x72BT", read)
+        #pragma section(".SEC_0x73BU", read)
+        #pragma section(".SEC_0x74BV", read)
+        #pragma section(".SEC_0x75BW", read)
+        #pragma section(".SEC_0x76BX", read)
+        #pragma section(".SEC_0x77BY", read)
+        #pragma section(".SEC_0x78BZ", read)
+        #pragma section(".SEC_0x79CA", read)
+        #pragma section(".SEC_0x80CB", read)
+        #pragma section(".SEC_0x81CC", read)
+        #pragma section(".SEC_0x82CD", read)
+        #pragma section(".SEC_0x83CE", read)
+        #pragma section(".SEC_0x84CF", read)
+        #pragma section(".SEC_0x85CG", read)
+        #pragma section(".SEC_0x86CH", read)
+        #pragma section(".SEC_0x87CI", read)
+        #pragma section(".SEC_0x88CJ", read)
+        #pragma section(".SEC_0x89CK", read)
+        #pragma section(".SEC_0x90CL", read)
+        #pragma section(".SEC_0x91CM", read)
+        #pragma section(".SEC_0x92CN", read)
+        #pragma section(".SEC_0x93CO", read)
+        #pragma section(".SEC_0x94CP", read)
+        #pragma section(".SEC_0x95CQ", read)
+        #pragma section(".SEC_0x96CR", read)
+        #pragma section(".SEC_0x97CS", read)
+        #pragma section(".SEC_0x98CT", read)
+        #pragma section(".SEC_0x99CU", read)
+        #pragma section(".SEC_0x100CV", read)
     #endif
+
     FAKE_SIG(_enigma1, ".enigma1", 0); FAKE_SIG(_enigma2, ".enigma2", 0);
     FAKE_SIG(_vmp1, ".vmp0", 0); FAKE_SIG(_vmp2, ".vmp1", 0); FAKE_SIG(_vmp3, ".vmp2", 0);
     FAKE_SIG(_denuvo1, ".arch", 0); FAKE_SIG(_denuvo2, ".srdata", 0); FAKE_SIG(_denuvo3, ".xdata", 0);
     FAKE_SIG(_denuvo5, ".xtls", "\x64\x65\x6E\x75\x76\x6F\x5F\x61\x74\x64\x00\x00\x00\x00\x00\x00");
     FAKE_SIG(_themida1, ".themida", 0);
     FAKE_SIG(_securom1, ".dsstext", 0);
+    
+    FAKE_SIG(_extra1, ".NIGGER", "\x44\x45\x56\x49\x4C");  
+    FAKE_SIG(_extra2, ".NIGGER1", "\x53\x4B\x55\x4C\x4C");  
+    FAKE_SIG(_extra3, ".NIGGER2", "\x53\x45\x43\x55\x52\x45");  
+    FAKE_SIG(_extra4, ".NIGGER3", "\x46\x4C\x41\x4D\x45");  
+    FAKE_SIG(_extra5, ".NIGGER4", "\x53\x59\x53\x54\x45\x4D");  
+    FAKE_SIG(_extra6, ".NIGGER5", "\x53\x59\x53\x54\x45\x4D\x4F");  
+    FAKE_SIG(_rand1, ".SEC_0x1A", "\x50\x52\x4F\x54\x45\x43\x54"); 
+    FAKE_SIG(_rand2, ".SEC_0x2B", "\x53\x45\x43\x55\x52\x45\x44");
+    FAKE_SIG(_rand3, ".SEC_0x3C", "\x52\x49\x54\x59\x5F\x4B\x45");
+    FAKE_SIG(_rand4, ".SEC_0x4D", "\x43\x4F\x44\x45\x5F\x53\x45");
+    FAKE_SIG(_rand5, ".SEC_0x5E", "\x44\x41\x54\x41\x5F\x50\x52");
+    FAKE_SIG(_rand6, ".SEC_0x6F", "\x48\x41\x53\x48\x5F\x4B\x45");
+    FAKE_SIG(_rand7, ".SEC_0x7G", "\x43\x52\x59\x50\x54\x4F\x53");
+    FAKE_SIG(_rand8, ".SEC_0x8H", "\x53\x41\x4C\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand9, ".SEC_0x9I", "\x4B\x45\x59\x53\x5F\x53\x45");
+    FAKE_SIG(_rand10, ".SEC_0x10J", "\x42\x59\x54\x45\x5F\x43\x4F");
+    FAKE_SIG(_rand11, ".SEC_0x11K", "\x48\x45\x58\x5F\x44\x41\x54");
+    FAKE_SIG(_rand12, ".SEC_0x12L", "\x43\x4F\x44\x45\x5F\x50\x52");
+    FAKE_SIG(_rand13, ".SEC_0x13M", "\x53\x45\x43\x5F\x44\x41\x54");
+    FAKE_SIG(_rand14, ".SEC_0x14N", "\x50\x52\x4F\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand15, ".SEC_0x15O", "\x4B\x45\x59\x5F\x44\x41\x54");
+    FAKE_SIG(_rand16, ".SEC_0x16P", "\x48\x41\x53\x48\x5F\x53\x45");
+    FAKE_SIG(_rand17, ".SEC_0x17Q", "\x43\x52\x59\x50\x54\x5F\x4B");
+    FAKE_SIG(_rand18, ".SEC_0x18R", "\x53\x41\x4C\x54\x5F\x50\x52");
+    FAKE_SIG(_rand19, ".SEC_0x19S", "\x42\x59\x54\x45\x5F\x53\x45");
+    FAKE_SIG(_rand20, ".SEC_0x20T", "\x48\x45\x58\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand21, ".SEC_0x21U", "\x43\x4F\x44\x45\x5F\x4B\x45");
+    FAKE_SIG(_rand22, ".SEC_0x22V", "\x53\x45\x43\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand23, ".SEC_0x23W", "\x50\x52\x4F\x54\x5F\x53\x45");
+    FAKE_SIG(_rand24, ".SEC_0x24X", "\x4B\x45\x59\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand25, ".SEC_0x25Y", "\x48\x41\x53\x48\x5F\x44\x41");
+    FAKE_SIG(_rand26, ".SEC_0x26Z", "\x43\x52\x59\x50\x54\x5F\x53");
+    FAKE_SIG(_rand27, ".SEC_0x27AA", "\x53\x41\x4C\x54\x5F\x44\x41");
+    FAKE_SIG(_rand28, ".SEC_0x28AB", "\x42\x59\x54\x45\x5F\x50\x52");
+    FAKE_SIG(_rand29, ".SEC_0x29AC", "\x48\x45\x58\x5F\x53\x45\x43");
+    FAKE_SIG(_rand30, ".SEC_0x30AD", "\x43\x4F\x44\x45\x5F\x44\x41");
+    FAKE_SIG(_rand31, ".SEC_0x31AE", "\x53\x45\x43\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand32, ".SEC_0x32AF", "\x50\x52\x4F\x54\x5F\x44\x41");
+    FAKE_SIG(_rand33, ".SEC_0x33AG", "\x4B\x45\x59\x5F\x53\x45\x43");
+    FAKE_SIG(_rand34, ".SEC_0x34AH", "\x48\x41\x53\x48\x5F\x50\x52");
+    FAKE_SIG(_rand35, ".SEC_0x35AI", "\x43\x52\x59\x50\x54\x5F\x44");
+    FAKE_SIG(_rand36, ".SEC_0x36AJ", "\x53\x41\x4C\x54\x5F\x53\x45");
+    FAKE_SIG(_rand37, ".SEC_0x37AK", "\x42\x59\x54\x45\x5F\x44\x41");
+    FAKE_SIG(_rand38, ".SEC_0x38AL", "\x48\x45\x58\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand39, ".SEC_0x39AM", "\x43\x4F\x44\x45\x5F\x53\x45");
+    FAKE_SIG(_rand40, ".SEC_0x40AN", "\x53\x45\x43\x5F\x44\x41\x54");
+    FAKE_SIG(_rand41, ".SEC_0x41AO", "\x50\x52\x4F\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand42, ".SEC_0x42AP", "\x4B\x45\x59\x5F\x44\x41\x54");
+    FAKE_SIG(_rand43, ".SEC_0x43AQ", "\x48\x41\x53\x48\x5F\x53\x45");
+    FAKE_SIG(_rand44, ".SEC_0x44AR", "\x43\x52\x59\x50\x54\x5F\x4B");
+    FAKE_SIG(_rand45, ".SEC_0x45AS", "\x53\x41\x4C\x54\x5F\x50\x52");
+    FAKE_SIG(_rand46, ".SEC_0x46AT", "\x42\x59\x54\x45\x5F\x53\x45");
+    FAKE_SIG(_rand47, ".SEC_0x47AU", "\x48\x45\x58\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand48, ".SEC_0x48AV", "\x43\x4F\x44\x45\x5F\x4B\x45");
+    FAKE_SIG(_rand49, ".SEC_0x49AW", "\x53\x45\x43\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand50, ".SEC_0x50AX", "\x50\x52\x4F\x54\x5F\x53\x45");
+    FAKE_SIG(_rand51, ".SEC_0x51AY", "\x4B\x45\x59\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand52, ".SEC_0x52AZ", "\x48\x41\x53\x48\x5F\x44\x41");
+    FAKE_SIG(_rand53, ".SEC_0x53BA", "\x43\x52\x59\x50\x54\x5F\x53");
+    FAKE_SIG(_rand54, ".SEC_0x54BB", "\x53\x41\x4C\x54\x5F\x44\x41");
+    FAKE_SIG(_rand55, ".SEC_0x55BC", "\x42\x59\x54\x45\x5F\x50\x52");
+    FAKE_SIG(_rand56, ".SEC_0x56BD", "\x48\x45\x58\x5F\x53\x45\x43");
+    FAKE_SIG(_rand57, ".SEC_0x57BE", "\x43\x4F\x44\x45\x5F\x44\x41");
+    FAKE_SIG(_rand58, ".SEC_0x58BF", "\x53\x45\x43\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand59, ".SEC_0x59BG", "\x50\x52\x4F\x54\x5F\x44\x41");
+    FAKE_SIG(_rand60, ".SEC_0x60BH", "\x4B\x45\x59\x5F\x53\x45\x43");
+    FAKE_SIG(_rand61, ".SEC_0x61BI", "\x48\x41\x53\x48\x5F\x50\x52");
+    FAKE_SIG(_rand62, ".SEC_0x62BJ", "\x43\x52\x59\x50\x54\x5F\x44");
+    FAKE_SIG(_rand63, ".SEC_0x63BK", "\x53\x41\x4C\x54\x5F\x53\x45");
+    FAKE_SIG(_rand64, ".SEC_0x64BL", "\x42\x59\x54\x45\x5F\x44\x41");
+    FAKE_SIG(_rand65, ".SEC_0x65BM", "\x48\x45\x58\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand66, ".SEC_0x66BN", "\x43\x4F\x44\x45\x5F\x53\x45");
+    FAKE_SIG(_rand67, ".SEC_0x67BO", "\x53\x45\x43\x5F\x44\x41\x54");
+    FAKE_SIG(_rand68, ".SEC_0x68BP", "\x50\x52\x4F\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand69, ".SEC_0x69BQ", "\x4B\x45\x59\x5F\x44\x41\x54");
+    FAKE_SIG(_rand70, ".SEC_0x70BR", "\x48\x41\x53\x48\x5F\x53\x45");
+    FAKE_SIG(_rand71, ".SEC_0x71BS", "\x43\x52\x59\x50\x54\x5F\x4B");
+    FAKE_SIG(_rand72, ".SEC_0x72BT", "\x53\x41\x4C\x54\x5F\x50\x52");
+    FAKE_SIG(_rand73, ".SEC_0x73BU", "\x42\x59\x54\x45\x5F\x53\x45");
+    FAKE_SIG(_rand74, ".SEC_0x74BV", "\x48\x45\x58\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand75, ".SEC_0x75BW", "\x43\x4F\x44\x45\x5F\x4B\x45");
+    FAKE_SIG(_rand76, ".SEC_0x76BX", "\x53\x45\x43\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand77, ".SEC_0x77BY", "\x50\x52\x4F\x54\x5F\x53\x45");
+    FAKE_SIG(_rand78, ".SEC_0x78BZ", "\x4B\x45\x59\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand79, ".SEC_0x79CA", "\x48\x41\x53\x48\x5F\x44\x41");
+    FAKE_SIG(_rand80, ".SEC_0x80CB", "\x43\x52\x59\x50\x54\x5F\x53");
+    FAKE_SIG(_rand81, ".SEC_0x81CC", "\x53\x41\x4C\x54\x5F\x44\x41");
+    FAKE_SIG(_rand82, ".SEC_0x82CD", "\x42\x59\x54\x45\x5F\x50\x52");
+    FAKE_SIG(_rand83, ".SEC_0x83CE", "\x48\x45\x58\x5F\x53\x45\x43");
+    FAKE_SIG(_rand84, ".SEC_0x84CF", "\x43\x4F\x44\x45\x5F\x44\x41");
+    FAKE_SIG(_rand85, ".SEC_0x85CG", "\x53\x45\x43\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand86, ".SEC_0x86CH", "\x50\x52\x4F\x54\x5F\x44\x41");
+    FAKE_SIG(_rand87, ".SEC_0x87CI", "\x4B\x45\x59\x5F\x53\x45\x43");
+    FAKE_SIG(_rand88, ".SEC_0x88CJ", "\x48\x41\x53\x48\x5F\x50\x52");
+    FAKE_SIG(_rand89, ".SEC_0x89CK", "\x43\x52\x59\x50\x54\x5F\x44");
+    FAKE_SIG(_rand90, ".SEC_0x90CL", "\x53\x41\x4C\x54\x5F\x53\x45");
+    FAKE_SIG(_rand91, ".SEC_0x91CM", "\x42\x59\x54\x45\x5F\x44\x41");
+    FAKE_SIG(_rand92, ".SEC_0x92CN", "\x48\x45\x58\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand93, ".SEC_0x93CO", "\x43\x4F\x44\x45\x5F\x53\x45");
+    FAKE_SIG(_rand94, ".SEC_0x94CP", "\x53\x45\x43\x5F\x44\x41\x54");
+    FAKE_SIG(_rand95, ".SEC_0x95CQ", "\x50\x52\x4F\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand96, ".SEC_0x96CR", "\x4B\x45\x59\x5F\x44\x41\x54");
+    FAKE_SIG(_rand97, ".SEC_0x97CS", "\x48\x41\x53\x48\x5F\x53\x45");
+    FAKE_SIG(_rand98, ".SEC_0x98CT", "\x43\x52\x59\x50\x54\x5F\x4B");
+    FAKE_SIG(_rand99, ".SEC_0x99CU", "\x53\x41\x4C\x54\x5F\x50\x52");
+    FAKE_SIG(_rand100, ".SEC_0x100CV", "\x42\x59\x54\x45\x5F\x53\x45");
 #endif
 
 #pragma section(Name_Of_Sections_watermark, read)
@@ -116,7 +330,7 @@ struct REMOTE_PE_HEADER : PE_HEADER {
 #define INTEGRITY_CHECK_FUNC_NAME ________________________________
 #define START_INTEGRITY_CHECK std::thread([]() { INTEGRITY_CHECK_FUNC_NAME(); }).detach()
 
-DWORD64 Function_Address;
+DWORD64 Function_Addressz;
 volatile int chaos_seed = 10003;
 
 #include <winternl.h>
@@ -349,6 +563,8 @@ inline uint32_t rotl32(uint32_t x, unsigned int n) {
 } while(0)
 
 #define BUG_IDA do { \
+    ULTRA_MEGA_JUNK(0); \
+    Junkyyyyyyy(0); \
     ULTRA_MEGA_JUNK(0); \
     Junkyyyyyyy(0); \
     ULTRA_MEGA_JUNK(0); \
@@ -722,7 +938,7 @@ bool bDataCompare(const BYTE* pData, const BYTE* bMask, const char* szMask)
     return (*szMask) == 0;
 }
 
-DWORD64 FindPattern(BYTE* bMask, const char* szMask)
+DWORD64 FindPatternz(BYTE* bMask, const char* szMask)
 {
     MODULEINFO mi{ };
     GetModuleInformation(GetCurrentProcess(), GetModuleHandleA(NULL), &mi, sizeof(mi));
@@ -755,7 +971,7 @@ void error(std::string& message) {
     error(std::string(message));
 }
 
-auto check_section_integrity(const char* section_name, bool fix = false) -> bool
+auto check_section_integrityz(const char* section_name, bool fix = false) -> bool
 {
     const auto hmodule = GetModuleHandle(0);
     if (!hmodule) {
@@ -785,9 +1001,9 @@ auto check_section_integrity(const char* section_name, bool fix = false) -> bool
 
     wchar_t filename[MAX_PATH];
     DWORD size = MAX_PATH;
-    QueryFullProcessImageName(GetCurrentProcess(), 0, filename, &size);
+    QueryFullProcessImageNameW(GetCurrentProcess(), 0, filename, &size);
 
-    const auto file_handle = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    const auto file_handle = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (!file_handle || file_handle == INVALID_HANDLE_VALUE) {
         error(OBF("Memory integrity check failed: Unable to open process file"));
         return true;
@@ -875,7 +1091,7 @@ auto check_section_integrity(const char* section_name, bool fix = false) -> bool
     return patched;
 }
 
-std::string checksum()
+std::string checksumz()
 {
     auto exec = [&](const char* cmd) -> std::string
         {
@@ -906,7 +1122,7 @@ std::string checksum()
 #include <aclapi.h>
 #include <bcrypt.h>
 
-inline bool LockMemAccess()
+inline bool LockMemAccessz()
 {
     bool bSuccess = false;
     HANDLE hToken = nullptr;
@@ -997,7 +1213,7 @@ Cleanup:
     return bSuccess;
 }
 
-bool checkAcceleratorIntegrity() {
+bool checkAcceleratorIntegrityz() {
     HMODULE hModule = GetModuleHandle(NULL);
     HRSRC hRsrc = FindResource(hModule, MAKEINTRESOURCE(1), RT_ACCELERATOR);
 
@@ -1010,30 +1226,30 @@ bool checkAcceleratorIntegrity() {
 
 void INTEGRITY_CHECK_FUNC_NAME()
 {
-    check_section_integrity(".text", true);
+    check_section_integrityz(".text", true);
 
     while (true)
     {
-        if (!checkAcceleratorIntegrity()) {
+        if (!checkAcceleratorIntegrityz()) {
             error(OBF("Critical security violation: Resource tampering detected"));
         }
 
-        if (check_section_integrity(".text"), false)
+        if (check_section_integrityz(".text"), false)
         {
             error(OBF("Critical security violation: Memory tampering detected"));
         }
 
-        if (!LockMemAccess())
+        if (!LockMemAccessz())
         {
             error(OBF("Critical security violation: Memory protection failure"));
         }
 
-        if (Function_Address == NULL) {
+        if (Function_Addressz == NULL) {
             BYTE pattern[] = "\x48\x89\x74\x24\x00\x57\x48\x81\xec\x00\x00\x00\x00\x49\x8b\xf0";
-            Function_Address = FindPattern(pattern, "xxxx?xxxx????xxx") - 0x5;
+            Function_Addressz = FindPatternz(pattern, "xxxx?xxxx????xxx") - 0x5;
         }
 
-        BYTE Instruction = *(BYTE*)Function_Address;
+        BYTE Instruction = *(BYTE*)Function_Addressz;
         if ((DWORD64)Instruction == 0xE9) {
             error(OBF("Critical security violation: Code execution flow compromised"));
         }
@@ -1459,7 +1675,6 @@ INLINE void anti_pause_thread() {
                             NULL))) {
                             if (suspendCount > 0) {
                                 while (ResumeThread(thread.handle) > 0) {}
-                                error(OBF("Critical security violation: Thread suspension detected!"));
                             }
                         }
                     }
@@ -1468,7 +1683,6 @@ INLINE void anti_pause_thread() {
                 DWORD exitCode;
                 if (GetExitCodeThread(thread.handle, &exitCode)) {
                     if (exitCode != STILL_ACTIVE) {
-                        error(OBF("Critical security violation: Protected thread terminated!"));
                     }
                 }
             }
@@ -1552,7 +1766,8 @@ const std::vector<std::string> system_dlls = {
     "VCRUNTIME140.DLL",
     "VCRUNTIME140_1.DLL",
     "MSVCP140.DLL",
-    "CONCRT140.DLL"
+    "CONCRT140.DLL",
+    "nvldumdx.dll"
 };
 
 bool is_system_dll(const std::string& dll_name) {
@@ -2340,3 +2555,345 @@ void RunProtection() {
         error(OBF("Critical protection failure"));
     }
 }
+
+#define HIDE_CALL(...) \
+    [&]() { \
+        if (chaos_seed % 2) { __VA_ARGS__; } \
+    }()
+
+#define HIDE_CALL_THREAD(func) \
+    []() { \
+        if (chaos_seed % 2) { func(); } \
+    }
+
+#define HIDDEN_ENTRY_POINT(name) \
+    void __declspec(safebuffers) WINAPI name##_hidden(); \
+    void WINAPI name() { \
+        ULTRA_MEGA_JUNK(0); \
+        void (*hidden_entry)() = nullptr; \
+        hidden_entry = (void(*)())name##_hidden; \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            hidden_entry(); \
+        } else { \
+            JUNK_FUCK_IDA; \
+            hidden_entry(); \
+        } \
+    } \
+    void __declspec(safebuffers) WINAPI name##_hidden()
+
+#define DECLARE_HIDDEN_ENTRY(name) \
+    void WINAPI name(); \
+    void WINAPI name##_hidden();
+
+#define HIDDEN_ENTRY(return_type, name, ...) \
+    return_type __declspec(safebuffers) name##_hidden(__VA_ARGS__); \
+    return_type name(__VA_ARGS__) { \
+        ULTRA_MEGA_JUNK(0); \
+        return_type (*hidden_entry)(__VA_ARGS__) = nullptr; \
+        hidden_entry = (return_type(*)(__VA_ARGS__))name##_hidden; \
+        JUNK_FUCK_IDA; \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            return hidden_entry(__VA_ARGS__); \
+        } else { \
+            BUG_IDA; \
+            return hidden_entry(__VA_ARGS__); \
+        } \
+    } \
+    return_type __declspec(safebuffers) name##_hidden(__VA_ARGS__)
+
+#define HIDDEN_START_IMPL \
+    HIDDEN_ENTRY(int, WinMain, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+
+#define HIDDEN_START \
+    HIDDEN_ENTRY(int, main)
+
+#define EXPORT_PROTECT(return_type, name, ...) \
+    return_type name##_protected(__VA_ARGS__); \
+    extern "C" __declspec(dllexport) return_type name(__VA_ARGS__) { \
+        ULTRA_MEGA_JUNK(0); \
+        return_type (*protected_func)(__VA_ARGS__) = nullptr; \
+        protected_func = (return_type(*)(__VA_ARGS__))name##_protected; \
+        JUNK_FUCK_IDA; \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            return protected_func(__VA_ARGS__); \
+        } else { \
+            BUG_IDA; \
+            return protected_func(__VA_ARGS__); \
+        } \
+    } \
+    return_type name##_protected(__VA_ARGS__)
+
+#define PROTECT_CALL(func, ...) \
+    [&]() { \
+        ULTRA_MEGA_JUNK(0); \
+        auto result = func(__VA_ARGS__); \
+        JUNK_FUCK_IDA; \
+        if (chaos_seed % 3 == 0) { \
+            BUG_IDA; \
+            return result; \
+        } else if (chaos_seed % 3 == 1) { \
+            CALL_RANDOM_JUNK; \
+            return result; \
+        } else { \
+            JUNK_VAR; \
+            return result; \
+        } \
+    }()
+
+#define PROTECT_VOID_CALL(func, ...) \
+    [&]() { \
+        ULTRA_MEGA_JUNK(0); \
+        if (chaos_seed % 3 == 0) { \
+            BUG_IDA; \
+            func(__VA_ARGS__); \
+        } else if (chaos_seed % 3 == 1) { \
+            CALL_RANDOM_JUNK; \
+            func(__VA_ARGS__); \
+        } else { \
+            JUNK_VAR; \
+            func(__VA_ARGS__); \
+        } \
+    }()
+
+#define PROTECT_CLASS_METHOD(class_name, return_type, method_name, ...) \
+    return_type method_name##_protected(__VA_ARGS__); \
+    return_type method_name(__VA_ARGS__) { \
+        ULTRA_MEGA_JUNK(0); \
+        return_type (class_name::*protected_method)(__VA_ARGS__) = &class_name::method_name##_protected; \
+        JUNK_FUCK_IDA; \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            return (this->*protected_method)(__VA_ARGS__); \
+        } else { \
+            BUG_IDA; \
+            return (this->*protected_method)(__VA_ARGS__); \
+        } \
+    } \
+    return_type method_name##_protected(__VA_ARGS__)
+
+#define PROTECT_STRING(str) \
+    [&]() { \
+        static auto protected_str = obffu::skCrypter<sizeof(str) / sizeof(str[0]), __TIME__[4], __TIME__[7], \
+            obffu::clean_type<decltype(str[0])>>((obffu::clean_type<decltype(str[0])>*)str); \
+        JUNK_VAR; \
+        return protected_str.decrypt(); \
+    }()
+
+#define PROTECT_SECTION(name) \
+    __declspec(allocate(Name_Of_Sections_watermark)) \
+    static const unsigned char name##_protected[] = { \
+        0xDE, 0xAD, 0xBE, 0xEF, \
+        0xCA, 0xFE, 0xBA, 0xBE, \
+        __TIME__[0], __TIME__[1], __TIME__[3], __TIME__[4], \
+        __DATE__[0], __DATE__[1], __DATE__[3], __DATE__[4], \
+        0xDE, 0xAD, 0xBE, 0xEF \
+    }; \
+    static void* const name##_ptr = (void*)name##_protected
+
+#define PROTECT_POINTER(ptr) \
+    [&]() { \
+        static volatile void* protected_ptr = nullptr; \
+        if (!protected_ptr) { \
+            ULTRA_MEGA_JUNK(0); \
+            protected_ptr = (void*)(ptr); \
+            JUNK_FUCK_IDA; \
+        } \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            return (decltype(ptr))protected_ptr; \
+        } else { \
+            BUG_IDA; \
+            return (decltype(ptr))protected_ptr; \
+        } \
+    }()
+
+#define PROTECT_FUNCTION_TABLE(class_name, ...) \
+    struct class_name##_vtable { \
+        void* entries[64]; \
+        class_name##_vtable() { \
+            ULTRA_MEGA_JUNK(0); \
+            void* funcs[] = { __VA_ARGS__ }; \
+            for(int i = 0; i < sizeof(funcs)/sizeof(void*); i++) { \
+                entries[i] = PROTECT_POINTER(funcs[i]); \
+            } \
+            JUNK_FUCK_IDA; \
+        } \
+        template<typename T> \
+        T get(int index) { \
+            JUNK_VAR; \
+            return (T)entries[index]; \
+        } \
+    }; \
+    static class_name##_vtable vtable_instance
+
+#define PROTECT_CODE_SEGMENT \
+    static void __declspec(safebuffers) protect_code() { \
+        BYTE* base = (BYTE*)GetModuleHandle(NULL); \
+        PIMAGE_DOS_HEADER dos = (PIMAGE_DOS_HEADER)base; \
+        PIMAGE_NT_HEADERS nt = (PIMAGE_NT_HEADERS)(base + dos->e_lfanew); \
+        PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(nt); \
+        for (WORD i = 0; i < nt->FileHeader.NumberOfSections; i++) { \
+            if (section[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) { \
+                DWORD old; \
+                VirtualProtect(base + section[i].VirtualAddress, \
+                    section[i].Misc.VirtualSize, \
+                    PAGE_EXECUTE_READWRITE, &old); \
+                for (DWORD j = 0; j < section[i].Misc.VirtualSize - 1; j++) { \
+                    if (*(WORD*)(base + section[i].VirtualAddress + j) == 0xCCCC) { \
+                        *(WORD*)(base + section[i].VirtualAddress + j) = 0x9090; \
+                    } \
+                } \
+                VirtualProtect(base + section[i].VirtualAddress, \
+                    section[i].Misc.VirtualSize, old, &old); \
+            } \
+        } \
+    }
+
+#define INIT_PROTECTION \
+    JUNK_FUCK_IDA; \
+    protect_code(); \
+    START_INTEGRITY_CHECK; \
+    START_ANTI_ATTACH; \
+    START_ANTI_WINDOW_TITLE; \
+    START_JUNK_THREADS; \
+    START_ANTI_PAUSE_THREAD; \
+    START_ANTI_TERMINATE_THREAD; \
+    START_ANTI_DLL_INJECTION; \
+    START_ANTI_CODE_PATCH; \
+    START_ANTI_API_HOOK; \
+    START_ANTI_IAT_HOOK; \
+    START_ANTI_DEBUG; \
+    START_ANTI_DUMP_AND_SEH; \
+    JUNK_FUCK_IDA
+
+#define PROTECT_CRITICAL_SECTION(code) \
+    [&]() { \
+        ULTRA_MEGA_JUNK(0); \
+        static volatile bool initialized = false; \
+        static volatile void* code_ptr = nullptr; \
+        if (!initialized) { \
+            code_ptr = &&code_label; \
+            initialized = true; \
+        } \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            goto *code_ptr; \
+        } else { \
+            BUG_IDA; \
+            goto *code_ptr; \
+        } \
+        code_label: \
+        JUNK_FUCK_IDA; \
+        code; \
+        ULTRA_MEGA_JUNK(0); \
+    }()
+
+#define KILL_PYQT_APPS \
+    std::thread([&]() { \
+        while (true) { \
+            ULTRA_MEGA_JUNK(0); \
+            HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); \
+            if (snapshot != INVALID_HANDLE_VALUE) { \
+                PROCESSENTRY32W pe32; \
+                pe32.dwSize = sizeof(pe32); \
+                if (Process32FirstW(snapshot, &pe32)) { \
+                    do { \
+                        char processName[MAX_PATH]; \
+                        wcstombs_s(nullptr, processName, pe32.szExeFile, MAX_PATH); \
+                        std::string procName = processName; \
+                        std::transform(procName.begin(), procName.end(), procName.begin(), ::tolower); \
+                        \
+                        if (procName.find("python") != std::string::npos || \
+                            procName.find("pyqt") != std::string::npos || \
+                            procName.find("pyside") != std::string::npos || \
+                            procName.find("qt5core") != std::string::npos || \
+                            procName.find("qt6core") != std::string::npos || \
+                            procName.find("qtcore") != std::string::npos || \
+                            procName.find("qtwidgets") != std::string::npos) { \
+                            \
+                            HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID); \
+                            if (hProcess != NULL) { \
+                                TerminateProcess(hProcess, 0); \
+                                CloseHandle(hProcess); \
+                            } \
+                        } \
+                    } while (Process32NextW(snapshot, &pe32)); \
+                } \
+                CloseHandle(snapshot); \
+            } \
+            CALL_RANDOM_JUNK; \
+            Sleep(100); \
+        } \
+    }).detach()
+
+#define KILL_PYQT_APPS \
+    std::thread([&]() { \
+        const std::vector<std::string> qt_dlls = { \
+            "python", "pyqt", "pyside", \
+            "qt5core", "qt6core", "qtcore", "qtwidgets", \
+            "qt5gui", "qt6gui", "qtgui", \
+            "qt5widgets", "qt6widgets", \
+            "qt5network", "qt6network", \
+            "sip", "pyqt5", "pyqt6", "pyside2", "pyside6", \
+            "qt5qml", "qt6qml", "qtqml", \
+            "qt5quick", "qt6quick", "qtquick", \
+            "qt5webengine", "qt6webengine", \
+            "qt5webkit", "qt6webkit", \
+            "qt5multimedia", "qt6multimedia", \
+            "python3", "python2", "pythonw", \
+            "qt5printsupport", "qt6printsupport", \
+            "qt5svg", "qt6svg", \
+            "qt5charts", "qt6charts" \
+        }; \
+        \
+        while (true) { \
+            ULTRA_MEGA_JUNK(0); \
+            HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); \
+            if (snapshot != INVALID_HANDLE_VALUE) { \
+                PROCESSENTRY32W pe32; \
+                pe32.dwSize = sizeof(pe32); \
+                if (Process32FirstW(snapshot, &pe32)) { \
+                    do { \
+                        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe32.th32ProcessID); \
+                        if (hProcess != NULL) { \
+                            HMODULE hMods[1024]; \
+                            DWORD cbNeeded; \
+                            bool should_kill = false; \
+                            \
+                            if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) { \
+                                for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)) && !should_kill; i++) { \
+                                    char modName[MAX_PATH]; \
+                                    if (GetModuleBaseNameA(hProcess, hMods[i], modName, sizeof(modName))) { \
+                                        std::string modNameStr = modName; \
+                                        std::transform(modNameStr.begin(), modNameStr.end(), modNameStr.begin(), ::tolower); \
+                                        \
+                                        for (const auto& dll : qt_dlls) { \
+                                            if (modNameStr.find(dll) != std::string::npos) { \
+                                                should_kill = true; \
+                                                break; \
+                                            } \
+                                        } \
+                                    } \
+                                } \
+                            } \
+                            \
+                            if (should_kill) { \
+                                HANDLE hKillProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID); \
+                                if (hKillProcess != NULL) { \
+                                    TerminateProcess(hKillProcess, 0); \
+                                    CloseHandle(hKillProcess); \
+                                } \
+                            } \
+                            CloseHandle(hProcess); \
+                        } \
+                    } while (Process32NextW(snapshot, &pe32)); \
+                } \
+                CloseHandle(snapshot); \
+            } \
+            CALL_RANDOM_JUNK; \
+            Sleep(100); \
+        } \
+    }).detach()
