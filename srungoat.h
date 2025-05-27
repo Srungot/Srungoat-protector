@@ -28,7 +28,7 @@
 
     Copyright (c) 2025 nizzixCR
 
-    Permission is hereby granted to any person obtaining a copy of this software (the “Software”) to use, copy, modify, and distribute both original and modified versions of the source code under the following conditions:
+    Permission is hereby granted to any person obtaining a copy of this software (the "Software") to use, copy, modify, and distribute both original and modified versions of the source code under the following conditions:
 
     1. You may:
     - Use the Software for personal, educational, or commercial purposes.
@@ -47,10 +47,10 @@
 */
 
 #define JUNK_ON_OBF 0  
-#define JUNK_ON_OBF_LEVEL 1          
-#define Name_Of_Sections_watermark ".1337"
+#define JUNK_ON_OBF_LEVEL 0     
+#define Name_Of_Sections_watermark ".nizmo"
 #define FAKE_SIGNATURES 1
-#define CALL_LEVEL 0  
+#define CALL_LEVEL 3  
 
 #ifdef _MSC_VER
     #define SECTION(x) __declspec(allocate(x))
@@ -2897,3 +2897,748 @@ void RunProtection() {
             Sleep(100); \
         } \
     }).detach()
+
+
+INLINE bool detect_hypervisor() {
+    int cpuInfo[4] = { 0 };
+    __cpuid(cpuInfo, 1);
+    return (cpuInfo[2] & (1 << 31)) != 0;
+}
+
+INLINE bool detect_vm() {
+    bool vm = false;
+
+    const char* vm_vendors[] = {
+        "VMware",
+        "VBox",
+        "VIRTUAL",
+        "QEMU",
+        "Xen",
+        "Parallels"
+    };
+
+    HKEY hKey;
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        char keyName[256];
+        DWORD index = 0;
+        DWORD nameSize = sizeof(keyName);
+
+        while (RegEnumKeyExA(hKey, index, keyName, &nameSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+            for (const auto& vendor : vm_vendors) {
+                if (strstr(keyName, vendor)) {
+                    vm = true;
+                    break;
+                }
+            }
+            nameSize = sizeof(keyName);
+            index++;
+        }
+        RegCloseKey(hKey);
+    }
+
+    return vm;
+}
+
+INLINE void anti_vm() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        if (detect_hypervisor() || detect_vm()) {
+            error(OBF("Virtual Machine detected!"));
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(100);
+    }
+}
+
+#define START_ANTI_VM std::thread([]() { anti_vm(); }).detach()
+
+INLINE void protect_memory_regions() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        MEMORY_BASIC_INFORMATION mbi;
+        PVOID address = 0;
+
+        while (VirtualQuery(address, &mbi, sizeof(mbi))) {
+            if (mbi.State == MEM_COMMIT &&
+                (mbi.Type == MEM_PRIVATE || mbi.Type == MEM_IMAGE)) {
+
+                DWORD oldProtect;
+                if (mbi.Protect & PAGE_EXECUTE ||
+                    mbi.Protect & PAGE_EXECUTE_READ ||
+                    mbi.Protect & PAGE_EXECUTE_READWRITE) {
+
+                    VirtualProtect(mbi.BaseAddress, mbi.RegionSize,
+                        PAGE_EXECUTE_READ, &oldProtect);
+                }
+            }
+            address = (PVOID)((DWORD_PTR)mbi.BaseAddress + mbi.RegionSize);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(100);
+    }
+}
+
+#define START_MEMORY_PROTECTION std::thread([]() { protect_memory_regions(); }).detach()
+
+struct SystemCall {
+    const char* name;
+    PVOID* address;
+    BYTE originalBytes[16];
+};
+
+std::vector<SystemCall> protected_syscalls;
+std::mutex syscalls_mutex;
+
+INLINE void protect_system_calls() {
+    const char* critical_syscalls[] = {
+        "NtCreateFile",
+        "NtOpenFile",
+        "NtReadFile",
+        "NtWriteFile",
+        "NtDeviceIoControlFile",
+        "NtQuerySystemInformation",
+        "NtQueryInformationProcess",
+        "NtSetInformationProcess"
+    };
+
+    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+    if (!ntdll) return;
+
+    for (const auto& syscall : critical_syscalls) {
+        PVOID addr = GetProcAddress(ntdll, syscall);
+        if (addr) {
+            SystemCall sc;
+            sc.name = syscall;
+            sc.address = (PVOID*)addr;
+            memcpy(sc.originalBytes, addr, 16);
+            protected_syscalls.push_back(sc);
+        }
+    }
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        std::lock_guard<std::mutex> lock(syscalls_mutex);
+        for (auto& syscall : protected_syscalls) {
+            if (memcmp(syscall.address, syscall.originalBytes, 16) != 0) {
+                DWORD oldProtect;
+                VirtualProtect(syscall.address, 16, PAGE_EXECUTE_READWRITE, &oldProtect);
+                memcpy(syscall.address, syscall.originalBytes, 16);
+                VirtualProtect(syscall.address, 16, oldProtect, &oldProtect);
+                error(OBF("System call hook detected and removed: ") + std::string(syscall.name));
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_SYSCALL_PROTECTION std::thread([]() { protect_system_calls(); }).detach()
+
+struct ApcContext {
+    PAPCFUNC apcFunction;
+    HANDLE threadHandle;
+    DWORD threadId;
+};
+
+std::vector<ApcContext> legitimate_apcs;
+std::mutex apc_mutex;
+
+INLINE void anti_apc_injection() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if (hThreadSnap != INVALID_HANDLE_VALUE) {
+            THREADENTRY32 te32;
+            te32.dwSize = sizeof(THREADENTRY32);
+
+            if (Thread32First(hThreadSnap, &te32)) {
+                do {
+                    if (te32.th32OwnerProcessID == GetCurrentProcessId()) {
+                        HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, te32.th32ThreadID);
+                        if (hThread) {
+                            CONTEXT ctx = { 0 };
+                            ctx.ContextFlags = CONTEXT_ALL;
+
+                            if (GetThreadContext(hThread, &ctx)) {
+                                if (ctx.Dr0 != 0 || ctx.Dr1 != 0 || ctx.Dr2 != 0 || ctx.Dr3 != 0) {
+                                    error(OBF("APC injection attempt detected!"));
+                                }
+                            }
+
+                            CloseHandle(hThread);
+                        }
+                    }
+                } while (Thread32Next(hThreadSnap, &te32));
+            }
+            CloseHandle(hThreadSnap);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_ANTI_APC std::thread([]() { anti_apc_injection(); }).detach()
+
+#pragma pack(push, 1)
+struct GDT_DESCRIPTOR {
+    WORD Limit;
+    DWORD64 Base;
+};
+
+struct GDT_ENTRY {
+    WORD LimitLow;
+    WORD BaseLow;
+    BYTE BaseMid;
+    BYTE Access;
+    BYTE LimitHigh : 4;
+    BYTE Flags : 4;
+    BYTE BaseHigh;
+};
+
+struct SEGMENT_DESCRIPTOR {
+    DWORD64 Base;
+    DWORD Limit;
+    union {
+        struct {
+            WORD Type : 4;
+            WORD S : 1;
+            WORD DPL : 2;
+            WORD P : 1;
+            WORD AVL : 1;
+            WORD L : 1;
+            WORD DB : 1;
+            WORD G : 1;
+            WORD Reserved : 4;
+        };
+        WORD Flags;
+    };
+};
+#pragma pack(pop)
+
+struct GdtEntry {
+    DWORD64 base;
+    DWORD limit;
+    WORD selector;
+    BYTE access;
+    BYTE flags;
+};
+
+std::vector<GdtEntry> original_gdt;
+std::mutex gdt_mutex;
+
+extern "C" void _sgdt(void*);
+#pragma intrinsic(_sgdt)
+
+INLINE void protect_gdt() {
+    GDT_DESCRIPTOR gdtr = { 0 };
+    _sgdt(&gdtr);
+
+    GDT_ENTRY* gdtBase = reinterpret_cast<GDT_ENTRY*>(gdtr.Base);
+    WORD gdtLimit = gdtr.Limit;
+
+    if (!gdtBase || gdtLimit == 0) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(gdt_mutex);
+    original_gdt.clear();
+
+    for (WORD i = 0; i < (gdtLimit + 1) / sizeof(GDT_ENTRY); i++) {
+        GdtEntry entry;
+        entry.base = gdtBase[i].BaseLow |
+            ((DWORD64)gdtBase[i].BaseMid << 16) |
+            ((DWORD64)gdtBase[i].BaseHigh << 24);
+        entry.limit = gdtBase[i].LimitLow |
+            ((DWORD)gdtBase[i].LimitHigh << 16);
+        entry.selector = i * 8;
+        entry.access = gdtBase[i].Access;
+        entry.flags = gdtBase[i].Flags;
+        original_gdt.push_back(entry);
+    }
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        GDT_DESCRIPTOR current_gdtr = { 0 };
+        _sgdt(&current_gdtr);
+
+        if (current_gdtr.Base != gdtr.Base || current_gdtr.Limit != gdtr.Limit) {
+            error(OBF("GDT base or limit modification detected!"));
+            continue;
+        }
+
+        GDT_ENTRY* currentGdtBase = reinterpret_cast<GDT_ENTRY*>(current_gdtr.Base);
+        if (!currentGdtBase) {
+            continue;
+        }
+
+        for (WORD i = 0; i < (gdtLimit + 1) / sizeof(GDT_ENTRY); i++) {
+            DWORD64 currentBase = currentGdtBase[i].BaseLow |
+                ((DWORD64)currentGdtBase[i].BaseMid << 16) |
+                ((DWORD64)currentGdtBase[i].BaseHigh << 24);
+            DWORD currentLimit = currentGdtBase[i].LimitLow |
+                ((DWORD)currentGdtBase[i].LimitHigh << 16);
+            BYTE currentAccess = currentGdtBase[i].Access;
+            BYTE currentFlags = currentGdtBase[i].Flags;
+
+            if (currentBase != original_gdt[i].base ||
+                currentLimit != original_gdt[i].limit ||
+                currentAccess != original_gdt[i].access ||
+                currentFlags != original_gdt[i].flags) {
+                error(OBF("GDT entry modification detected!"));
+
+                DWORD oldProtect;
+                if (VirtualProtect(&currentGdtBase[i], sizeof(GDT_ENTRY), PAGE_READWRITE, &oldProtect)) {
+                    currentGdtBase[i].BaseLow = (WORD)(original_gdt[i].base & 0xFFFF);
+                    currentGdtBase[i].BaseMid = (BYTE)((original_gdt[i].base >> 16) & 0xFF);
+                    currentGdtBase[i].BaseHigh = (BYTE)((original_gdt[i].base >> 24) & 0xFF);
+                    currentGdtBase[i].LimitLow = (WORD)(original_gdt[i].limit & 0xFFFF);
+                    currentGdtBase[i].LimitHigh = (original_gdt[i].limit >> 16) & 0x0F;
+                    currentGdtBase[i].Access = original_gdt[i].access;
+                    currentGdtBase[i].Flags = original_gdt[i].flags;
+                    VirtualProtect(&currentGdtBase[i], sizeof(GDT_ENTRY), oldProtect, &oldProtect);
+                }
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_GDT_PROTECTION std::thread([]() { protect_gdt(); }).detach()
+
+struct DebugRegisterState {
+    DWORD64 dr0;
+    DWORD64 dr1;
+    DWORD64 dr2;
+    DWORD64 dr3;
+    DWORD64 dr6;
+    DWORD64 dr7;
+};
+
+std::vector<DebugRegisterState> thread_debug_states;
+std::mutex debug_reg_mutex;
+
+INLINE void protect_debug_registers() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if (hThreadSnap != INVALID_HANDLE_VALUE) {
+            THREADENTRY32 te32;
+            te32.dwSize = sizeof(THREADENTRY32);
+
+            if (Thread32First(hThreadSnap, &te32)) {
+                do {
+                    if (te32.th32OwnerProcessID == GetCurrentProcessId()) {
+                        HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, te32.th32ThreadID);
+                        if (hThread) {
+                            CONTEXT ctx = { 0 };
+                            ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+
+                            if (GetThreadContext(hThread, &ctx)) {
+                                if (ctx.Dr0 != 0 || ctx.Dr1 != 0 ||
+                                    ctx.Dr2 != 0 || ctx.Dr3 != 0 ||
+                                    ctx.Dr6 != 0 || ctx.Dr7 != 0) {
+
+                                    ctx.Dr0 = ctx.Dr1 = ctx.Dr2 = ctx.Dr3 = 0;
+                                    ctx.Dr6 = ctx.Dr7 = 0;
+                                    SetThreadContext(hThread, &ctx);
+
+                                    error(OBF("Debug register modification detected and cleared!"));
+                                }
+                            }
+                            CloseHandle(hThread);
+                        }
+                    }
+                } while (Thread32Next(hThreadSnap, &te32));
+            }
+            CloseHandle(hThreadSnap);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_DEBUG_REG_PROTECTION std::thread([]() { protect_debug_registers(); }).detach()
+
+#pragma pack(push, 1)
+struct IDT_DESCRIPTOR {
+    WORD Limit;
+    DWORD64 Base;
+};
+
+struct IDT_ENTRY {
+    WORD OffsetLow;
+    WORD Selector;
+    BYTE Reserved;
+    BYTE Type;
+    WORD OffsetMiddle;
+    DWORD OffsetHigh;
+    DWORD Reserved2;
+};
+#pragma pack(pop)
+
+std::vector<IDT_ENTRY> original_idt;
+std::mutex idt_mutex;
+
+INLINE void protect_idt() {
+    IDT_DESCRIPTOR idtr = { 0 };
+    __sidt(&idtr);
+
+    IDT_ENTRY* idtBase = reinterpret_cast<IDT_ENTRY*>(idtr.Base);
+    WORD idtLimit = idtr.Limit;
+
+    std::lock_guard<std::mutex> lock(idt_mutex);
+    original_idt.assign(idtBase, idtBase + (idtLimit + 1) / sizeof(IDT_ENTRY));
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        IDT_DESCRIPTOR current_idtr = { 0 };
+        __sidt(&current_idtr);
+
+        if (current_idtr.Base != idtr.Base || current_idtr.Limit != idtr.Limit) {
+            error(OBF("IDT modification detected!"));
+            continue;
+        }
+
+        IDT_ENTRY* currentIdtBase = reinterpret_cast<IDT_ENTRY*>(current_idtr.Base);
+        for (size_t i = 0; i < original_idt.size(); i++) {
+            if (memcmp(&currentIdtBase[i], &original_idt[i], sizeof(IDT_ENTRY)) != 0) {
+                error(OBF("IDT entry modification detected!"));
+                DWORD oldProtect;
+                if (VirtualProtect(&currentIdtBase[i], sizeof(IDT_ENTRY), PAGE_READWRITE, &oldProtect)) {
+                    memcpy(&currentIdtBase[i], &original_idt[i], sizeof(IDT_ENTRY));
+                    VirtualProtect(&currentIdtBase[i], sizeof(IDT_ENTRY), oldProtect, &oldProtect);
+                }
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_IDT_PROTECTION std::thread([]() { protect_idt(); }).detach()
+
+struct TlsEntry {
+    DWORD index;
+    PVOID value;
+};
+
+std::vector<TlsEntry> legitimate_tls;
+std::mutex tls_mutex;
+
+INLINE void protect_tls() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        NT_TIB* tib = reinterpret_cast<NT_TIB*>(NtCurrentTeb());
+        if (!tib) continue;
+
+        PVOID tlsArray = tib->ThreadLocalStoragePointer;
+        if (!tlsArray) continue;
+
+        std::lock_guard<std::mutex> lock(tls_mutex);
+
+        for (DWORD i = 0; i < TLS_MINIMUM_AVAILABLE; i++) {
+            PVOID currentValue = reinterpret_cast<PVOID*>(tlsArray)[i];
+            auto it = std::find_if(legitimate_tls.begin(), legitimate_tls.end(),
+                [i](const TlsEntry& entry) { return entry.index == i; });
+
+            if (it != legitimate_tls.end() && it->value != currentValue) {
+                error(OBF("TLS modification detected!"));
+                reinterpret_cast<PVOID*>(tlsArray)[i] = it->value;
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_TLS_PROTECTION std::thread([]() { protect_tls(); }).detach()
+
+struct PageEntry {
+    PVOID address;
+    DWORD protection;
+    SIZE_T size;
+    std::vector<BYTE> content;
+};
+
+std::vector<PageEntry> protected_pages;
+std::mutex page_mutex;
+
+INLINE void protect_pages() {
+    SYSTEM_INFO sysInfo;
+    GetSystemInfo(&sysInfo);
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        MEMORY_BASIC_INFORMATION mbi;
+        PVOID address = 0;
+
+        std::lock_guard<std::mutex> lock(page_mutex);
+
+        while (VirtualQuery(address, &mbi, sizeof(mbi))) {
+            if (mbi.State == MEM_COMMIT &&
+                (mbi.Type == MEM_PRIVATE || mbi.Type == MEM_IMAGE)) {
+
+                auto it = std::find_if(protected_pages.begin(), protected_pages.end(),
+                    [&](const PageEntry& entry) { return entry.address == mbi.BaseAddress; });
+
+                if (it != protected_pages.end()) {
+                    std::vector<BYTE> currentContent(it->size);
+                    SIZE_T bytesRead;
+                    if (ReadProcessMemory(GetCurrentProcess(), it->address,
+                        currentContent.data(), it->size, &bytesRead)) {
+
+                        if (memcmp(currentContent.data(), it->content.data(), it->size) != 0) {
+                            error(OBF("Memory page modification detected!"));
+                            DWORD oldProtect;
+                            if (VirtualProtect(it->address, it->size, PAGE_READWRITE, &oldProtect)) {
+                                memcpy(it->address, it->content.data(), it->size);
+                                VirtualProtect(it->address, it->size, it->protection, &oldProtect);
+                            }
+                        }
+                    }
+                }
+            }
+            address = (PVOID)((DWORD_PTR)mbi.BaseAddress + mbi.RegionSize);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_PAGE_PROTECTION std::thread([]() { protect_pages(); }).detach()
+
+struct KernelCallback {
+    PVOID address;
+    BYTE originalBytes[32];
+};
+
+std::vector<KernelCallback> protected_callbacks;
+std::mutex callback_mutex;
+
+INLINE void protect_kernel_callbacks() {
+    const PVOID callbacks[] = {
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserExceptionDispatcher"),
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserApcDispatcher"),
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserCallbackDispatcher")
+    };
+
+    for (PVOID callback : callbacks) {
+        if (callback) {
+            KernelCallback cb;
+            cb.address = callback;
+            memcpy(cb.originalBytes, callback, sizeof(cb.originalBytes));
+            protected_callbacks.push_back(cb);
+        }
+    }
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        std::lock_guard<std::mutex> lock(callback_mutex);
+        for (auto& callback : protected_callbacks) {
+            if (memcmp(callback.address, callback.originalBytes, sizeof(callback.originalBytes)) != 0) {
+                error(OBF("Kernel callback modification detected!"));
+                DWORD oldProtect;
+                if (VirtualProtect(callback.address, sizeof(callback.originalBytes),
+                    PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                    memcpy(callback.address, callback.originalBytes, sizeof(callback.originalBytes));
+                    VirtualProtect(callback.address, sizeof(callback.originalBytes),
+                        oldProtect, &oldProtect);
+                }
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_KERNEL_CALLBACK_PROTECTION std::thread([]() { protect_kernel_callbacks(); }).detach()
+
+struct LibraryInfo {
+    std::string path;
+    DWORD64 baseAddress;
+    SIZE_T imageSize;
+    std::vector<BYTE> headerHash;
+    std::vector<BYTE> codeHash;
+};
+
+std::vector<LibraryInfo> protected_libraries;
+std::mutex libraries_mutex;
+
+std::vector<BYTE> calculate_sha256(const void* data, size_t size) {
+    std::vector<BYTE> hash(32); 
+    HCRYPTPROV hProv = 0;
+    HCRYPTHASH hHash = 0;
+
+    if (!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+        return hash;
+    }
+
+    if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
+        CryptReleaseContext(hProv, 0);
+        return hash;
+    }
+
+    if (!CryptHashData(hHash, (const BYTE*)data, (DWORD)size, 0)) {
+        CryptDestroyHash(hHash);
+        CryptReleaseContext(hProv, 0);
+        return hash;
+    }
+
+    DWORD hashSize = 32;
+    CryptGetHashParam(hHash, HP_HASHVAL, hash.data(), &hashSize, 0);
+
+    CryptDestroyHash(hHash);
+    CryptReleaseContext(hProv, 0);
+    return hash;
+}
+
+void initialize_library_protection() {
+    std::lock_guard<std::mutex> lock(libraries_mutex);
+    protected_libraries.clear();
+
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, GetCurrentProcessId());
+    if (snapshot == INVALID_HANDLE_VALUE) return;
+
+    MODULEENTRY32W me32;
+    me32.dwSize = sizeof(me32);
+
+    if (Module32FirstW(snapshot, &me32)) {
+        do {
+            LibraryInfo lib;
+            char path[MAX_PATH];
+            wcstombs_s(nullptr, path, me32.szExePath, MAX_PATH);
+            lib.path = path;
+            lib.baseAddress = (DWORD64)me32.modBaseAddr;
+            lib.imageSize = me32.modBaseSize;
+
+            PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)me32.modBaseAddr;
+            PIMAGE_NT_HEADERS ntHeaders = (PIMAGE_NT_HEADERS)((BYTE*)dosHeader + dosHeader->e_lfanew);
+            lib.headerHash = calculate_sha256(dosHeader, ntHeaders->OptionalHeader.SizeOfHeaders);
+
+            PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(ntHeaders);
+            for (WORD i = 0; i < ntHeaders->FileHeader.NumberOfSections; i++) {
+                if (section[i].Characteristics & IMAGE_SCN_CNT_CODE) {
+                    lib.codeHash = calculate_sha256(
+                        (BYTE*)me32.modBaseAddr + section[i].VirtualAddress,
+                        section[i].Misc.VirtualSize
+                    );
+                    break;
+                }
+            }
+
+            protected_libraries.push_back(lib);
+        } while (Module32NextW(snapshot, &me32));
+    }
+
+    CloseHandle(snapshot);
+}
+
+INLINE void protect_libraries() {
+    initialize_library_protection();
+
+    const std::vector<std::string> suspicious_dlls = {
+        "cheatengine",
+        "x96dbg",
+        "x32dbg",
+        "x64dbg",
+        "ida",
+        "ghidra",
+        "frida",
+        "wireshark",
+        "fiddler",
+        "charles",
+        "proxifier",
+        "process hacker",
+        "pestudio",
+        "die",
+        "protection_id",
+        "ollydbg",
+        "immunity",
+        "radare",
+        "cutter"
+    };
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, GetCurrentProcessId());
+        if (snapshot != INVALID_HANDLE_VALUE) {
+            MODULEENTRY32W me32;
+            me32.dwSize = sizeof(me32);
+
+            if (Module32FirstW(snapshot, &me32)) {
+                do {
+                    char moduleName[MAX_PATH];
+                    wcstombs_s(nullptr, moduleName, me32.szModule, MAX_PATH);
+                    std::string moduleNameStr = moduleName;
+                    std::transform(moduleNameStr.begin(), moduleNameStr.end(), moduleNameStr.begin(), ::tolower);
+
+                    for (const auto& suspicious : suspicious_dlls) {
+                        if (moduleNameStr.find(suspicious) != std::string::npos) {
+                            error(OBF("DLL suspecte détectée: ") + moduleNameStr);
+                            ExitProcess(0);
+                        }
+                    }
+
+                    std::lock_guard<std::mutex> lock(libraries_mutex);
+                    for (const auto& lib : protected_libraries) {
+                        if ((DWORD64)me32.modBaseAddr == lib.baseAddress) {
+                            PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)me32.modBaseAddr;
+                            PIMAGE_NT_HEADERS ntHeaders = (PIMAGE_NT_HEADERS)((BYTE*)dosHeader + dosHeader->e_lfanew);
+                            auto currentHeaderHash = calculate_sha256(dosHeader, ntHeaders->OptionalHeader.SizeOfHeaders);
+
+                            if (currentHeaderHash != lib.headerHash) {
+                                error(OBF("Modification des en-têtes PE détectée dans: ") + lib.path);
+                                ExitProcess(0);
+                            }
+
+                            PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(ntHeaders);
+                            for (WORD i = 0; i < ntHeaders->FileHeader.NumberOfSections; i++) {
+                                if (section[i].Characteristics & IMAGE_SCN_CNT_CODE) {
+                                    auto currentCodeHash = calculate_sha256(
+                                        (BYTE*)me32.modBaseAddr + section[i].VirtualAddress,
+                                        section[i].Misc.VirtualSize
+                                    );
+
+                                    if (currentCodeHash != lib.codeHash) {
+                                        error(OBF("Modification de code détectée dans: ") + lib.path);
+                                        ExitProcess(0);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                } while (Module32NextW(snapshot, &me32));
+            }
+            CloseHandle(snapshot);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(100);
+    }
+}
+
+#define START_LIBRARY_PROTECTION std::thread([]() { protect_libraries(); }).detach()
