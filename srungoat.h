@@ -3332,44 +3332,6 @@ INLINE void protect_idt() {
 
 #define START_IDT_PROTECTION std::thread([]() { protect_idt(); }).detach()
 
-struct TlsEntry {
-    DWORD index;
-    PVOID value;
-};
-
-std::vector<TlsEntry> legitimate_tls;
-std::mutex tls_mutex;
-
-INLINE void protect_tls() {
-    while (true) {
-        ULTRA_MEGA_JUNK(0);
-
-        NT_TIB* tib = reinterpret_cast<NT_TIB*>(NtCurrentTeb());
-        if (!tib) continue;
-
-        PVOID tlsArray = tib->ThreadLocalStoragePointer;
-        if (!tlsArray) continue;
-
-        std::lock_guard<std::mutex> lock(tls_mutex);
-
-        for (DWORD i = 0; i < TLS_MINIMUM_AVAILABLE; i++) {
-            PVOID currentValue = reinterpret_cast<PVOID*>(tlsArray)[i];
-            auto it = std::find_if(legitimate_tls.begin(), legitimate_tls.end(),
-                [i](const TlsEntry& entry) { return entry.index == i; });
-
-            if (it != legitimate_tls.end() && it->value != currentValue) {
-                error(OBF("TLS modification detected!"));
-                reinterpret_cast<PVOID*>(tlsArray)[i] = it->value;
-            }
-        }
-
-        CALL_RANDOM_JUNK;
-        Sleep(50);
-    }
-}
-
-#define START_TLS_PROTECTION std::thread([]() { protect_tls(); }).detach()
-
 struct PageEntry {
     PVOID address;
     DWORD protection;
@@ -3642,3 +3604,512 @@ INLINE void protect_libraries() {
 }
 
 #define START_LIBRARY_PROTECTION std::thread([]() { protect_libraries(); }).detach()
+
+namespace fake_auth {
+    static const char* const auth_urls[] = {
+        // KeyAuth URLs
+        "https://keyauth.win/api/1.0/init?ver=1.0&hash=",
+        "https://keyauth.com/api/v2/check?session=",
+        "https://keyauth.cc/api/v3/validate?license=",
+        "https://keyauth.pro/panel/admin?token=",
+        "https://keyauth.cloud/api/1.2/verify?key=",
+        "https://keyauth.vip/api/v2/authenticate?session=",
+        "https://keyauth.app/api/v1/check?license=",
+        "https://api.keyauth.ru/v2/validate?token=",
+        "https://panel.keyauth.cc/admin/verify?key=",
+        "https://auth.keyauth.win/v3/check?hwid=",
+        
+        // FluxAuth URLs
+        "https://fluxauth.com/api/check?key=",
+        "https://fluxauth.net/api/verify?hwid=",
+        "https://fluxauth.cc/panel/reseller?user=",
+        "https://fluxauth.io/api/session?auth=",
+        "https://api.fluxauth.net/v2/validate?token=",
+        "https://panel.fluxauth.com/admin/check?key=",
+        "https://auth.fluxauth.io/v1/verify?license=",
+        "https://flux-auth.com/api/v3/init?session=",
+        "https://fluxauth.org/dashboard/user?id=",
+        "https://secure.fluxauth.net/api/check?hwid=",
+        
+        // Auth Systems
+        "https://authifly.com/api/v1/check?license=",
+        "https://authifly.cc/panel/customer?id=",
+        "https://authifly.net/api/validate?token=",
+        "https://authifly.co/dashboard?session=",
+        "https://auth-panel.com/api/v2/init?ver=",
+        "https://auth-service.net/api/check?hwid=",
+        "https://auth-system.io/api/v3/verify?key=",
+        "https://auth-protect.com/panel/validate?token=",
+        "https://auth-secure.net/api/v2/check?license=",
+        "https://auth-guard.cc/api/v1/session?hwid=",
+        
+        // License Systems
+        "https://license-api.com/v1/verify?key=",
+        "https://license.secure.com/api/check?token=",
+        "https://license-system.net/api/v2/validate?key=",
+        "https://license.auth.io/v3/verify?hwid=",
+        "https://licensing.pro/api/v1/check?session=",
+        "https://license-guard.com/panel/verify?key=",
+        "https://secure-license.net/api/validate?token=",
+        "https://license.protection.cc/v2/check?id=",
+        "https://license-verify.com/api/auth?key=",
+        "https://license.shield.io/api/v3/validate?hwid=",
+        
+        // CryptAuth URLs
+        "https://cryptauth.com/api/v3/check?uid=",
+        "https://cryptauth.net/panel/admin?token=",
+        "https://cryptauth.io/api/validate?license=",
+        "https://cryptauth.cc/dashboard?session=",
+        "https://api.cryptauth.net/v2/verify?key=",
+        "https://panel.cryptauth.com/admin/check?hwid=",
+        "https://auth.cryptauth.io/v1/session?token=",
+        "https://secure.cryptauth.cc/api/v3/validate?id=",
+        "https://crypt-auth.com/panel/user?license=",
+        "https://cryptauth.org/api/v2/init?auth=",
+        
+        // SecureAuth URLs
+        "https://secureauth.win/api/v2/verify?key=",
+        "https://secure-auth.com/api/v1/check?token=",
+        "https://secureauth.cc/panel/validate?hwid=",
+        "https://secureauth.io/api/v3/session?id=",
+        "https://api.secureauth.net/v2/auth?license=",
+        "https://panel.secureauth.com/admin/verify?key=",
+        "https://auth.secureauth.cc/v1/validate?token=",
+        "https://secure.auth-api.com/v3/check?hwid=",
+        "https://secureauth.cloud/api/v2/init?session=",
+        "https://security-auth.com/panel/user?key=",
+        
+        // Protection Systems
+        "https://protect-auth.com/api/v1/verify?key=",
+        "https://protection.cc/api/v2/validate?token=",
+        "https://shield-auth.net/api/v3/check?hwid=",
+        "https://guard-system.com/panel/auth?id=",
+        "https://security-guard.io/api/v1/session?key=",
+        "https://protection-api.com/v2/verify?license=",
+        "https://shield.auth-api.net/v3/validate?token=",
+        "https://guard.secure.cc/api/v2/check?hwid=",
+        "https://protect.license.io/v1/auth?session=",
+        "https://security.shield.com/api/v3/verify?key="
+    };
+
+    static const char* const endpoints[] = {
+        // API Endpoints
+        "/api/v1/init",
+        "/api/v2/check",
+        "/api/v3/validate",
+        "/api/v1.2/verify",
+        "/api/v2.1/authenticate",
+        "/api/v3.0/session",
+        "/api/beta/validate",
+        "/api/stable/check",
+        "/api/release/verify",
+        "/api/enterprise/auth",
+        
+        // Panel Endpoints
+        "/panel/admin",
+        "/panel/reseller",
+        "/panel/customer",
+        "/panel/moderator",
+        "/panel/manager",
+        "/panel/support",
+        "/panel/developer",
+        "/panel/affiliate",
+        "/panel/partner",
+        "/panel/distributor",
+        
+        // Dashboard Endpoints
+        "/dashboard",
+        "/dashboard/home",
+        "/dashboard/users",
+        "/dashboard/licenses",
+        "/dashboard/sessions",
+        "/dashboard/analytics",
+        "/dashboard/security",
+        "/dashboard/settings",
+        "/dashboard/logs",
+        "/dashboard/webhooks",
+        
+        // Auth Endpoints
+        "/auth/login",
+        "/auth/register",
+        "/auth/verify",
+        "/auth/reset",
+        "/auth/session",
+        "/auth/token",
+        "/auth/refresh",
+        "/auth/revoke",
+        "/auth/validate",
+        "/auth/check",
+        
+        // License Endpoints
+        "/license/create",
+        "/license/verify",
+        "/license/update",
+        "/license/delete",
+        "/license/status",
+        "/license/extend",
+        "/license/transfer",
+        "/license/bind",
+        "/license/unbind",
+        "/license/history"
+    };
+
+    static const char* const params[] = {
+        // Version Parameters
+        "version=1.0",
+        "version=2.1",
+        "version=3.0",
+        "ver=1.2.3",
+        "ver=2.0.1",
+        "build=1234",
+        "build=5678",
+        "release=stable",
+        "release=beta",
+        "channel=prod",
+        
+        // Authentication Parameters
+        "hwid=",
+        "session=",
+        "token=",
+        "license=",
+        "key=",
+        "auth=",
+        "user=",
+        "client=",
+        "id=",
+        "apikey=",
+        
+        // Additional Parameters
+        "timestamp=",
+        "nonce=",
+        "signature=",
+        "hash=",
+        "checksum=",
+        "fingerprint=",
+        "device=",
+        "platform=",
+        "os=",
+        "app=",
+        
+        // Security Parameters
+        "integrity=",
+        "antitamper=",
+        "security=",
+        "protection=",
+        "encrypted=",
+        "signed=",
+        "verified=",
+        "trusted=",
+        "secure=",
+        "safe=",
+        
+        // User Parameters
+        "username=",
+        "email=",
+        "account=",
+        "profile=",
+        "role=",
+        "group=",
+        "level=",
+        "rank=",
+        "status=",
+        "type=",
+        
+        // License Parameters
+        "duration=",
+        "expiry=",
+        "created=",
+        "activated=",
+        "subscription=",
+        "plan=",
+        "package=",
+        "product=",
+        "feature=",
+        "access="
+    };
+
+    static const char* const responses[] = {
+        // Success Responses
+        "{\"success\":true,\"message\":\"Successfully authenticated\",\"token\":\"",
+        "{\"status\":\"success\",\"data\":{\"license\":\"valid\",\"expires\":\"",
+        "{\"result\":true,\"session\":\"",
+        "{\"authenticated\":true,\"user\":{\"id\":\"",
+        "{\"valid\":true,\"license\":{\"type\":\"",
+        "{\"success\":1,\"info\":{\"hwid\":\"",
+        "{\"code\":200,\"data\":{\"key\":\"",
+        "{\"ok\":true,\"response\":{\"auth\":\"",
+        "{\"status\":\"ok\",\"session\":{\"token\":\"",
+        "{\"success\":\"true\",\"license\":\"valid\",\"days\":\"",
+        
+        // Detailed Success Responses
+        "{\"success\":true,\"data\":{\"user\":{\"id\":\"\",\"username\":\"\",\"email\":\"\",\"role\":\"premium\"},\"license\":{\"key\":\"\",\"type\":\"lifetime\",\"expires\":\"never\"},\"session\":{\"token\":\"\",\"expires\":\"3600\"},\"hwid\":\"\"}}",
+        "{\"status\":\"success\",\"response\":{\"account\":{\"id\":\"\",\"level\":\"vip\",\"created\":\"2024-01-01\"},\"subscription\":{\"plan\":\"enterprise\",\"features\":[\"premium\",\"priority\"],\"active\":true},\"security\":{\"2fa\":true,\"ip_lock\":true}}}",
+        "{\"result\":\"ok\",\"auth\":{\"token\":\"\",\"refresh\":\"\",\"scope\":\"full\",\"permissions\":[\"read\",\"write\",\"admin\"]},\"user\":{\"verified\":true,\"status\":\"active\"},\"app\":{\"version\":\"1.0.0\",\"build\":\"stable\"}}",
+        
+        // Error Responses
+        "{\"success\":false,\"error\":\"Invalid license key\",\"code\":\"AUTH001\"}",
+        "{\"status\":\"error\",\"message\":\"Session expired\",\"details\":\"Please login again\"}",
+        "{\"result\":false,\"reason\":\"HWID mismatch\",\"expected\":\"",
+        "{\"error\":true,\"code\":403,\"message\":\"Access denied\",\"info\":\"IP blocked\"}",
+        "{\"success\":0,\"error\":\"Version outdated\",\"required\":\"2.0.0\"}",
+        "{\"status\":\"failed\",\"type\":\"security\",\"message\":\"Tampering detected\"}",
+        "{\"code\":401,\"error\":\"Unauthorized\",\"details\":\"Invalid token\"}",
+        
+        // Validation Responses
+        "{\"valid\":true,\"type\":\"subscription\",\"expires\":\"2025-01-01\",\"features\":[]}",
+        "{\"check\":\"passed\",\"integrity\":true,\"signature\":\"valid\",\"timestamp\":\"",
+        "{\"verification\":\"success\",\"level\":\"enterprise\",\"modules\":[\"premium\",\"business\"]}",
+        "{\"auth\":\"granted\",\"permissions\":{\"admin\":true,\"modify\":true},\"token\":\"",
+        "{\"license\":\"active\",\"plan\":\"premium\",\"restrictions\":{\"ip_lock\":true},\"key\":\"",
+        
+        // Security Responses
+        "{\"security\":{\"integrity\":\"valid\",\"tamper\":\"none\",\"debug\":\"none\",\"vm\":\"none\"}}",
+        "{\"protection\":{\"level\":\"maximum\",\"encryption\":\"enabled\",\"monitoring\":\"active\"}}",
+        "{\"system\":{\"safe\":true,\"threats\":0,\"scan\":\"completed\",\"hash\":\"",
+        "{\"environment\":{\"secure\":true,\"trusted\":true,\"verified\":true},\"token\":\"",
+        "{\"check\":{\"memory\":\"clean\",\"process\":\"verified\",\"modules\":\"valid\"},\"session\":\"" 
+    };
+
+    static const char* const fake_tokens[] = {
+        // JWT Tokens
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiQWxpY2UiLCJhZG1pbiI6dHJ1ZX0",
+        "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJzdXBlcnVzZXIiLCJwZXJtcyI6ImFsbCJ9",
+        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoicHJlbWl1bSIsInBsYW4iOiJlbnRlcnByaXNlIiwiZXhwIjoxNzA5MjkzMDIxfQ",
+        
+        // OAuth Tokens
+        "ya29.a0AfB_byC-1234567890-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "gho_1234567890abcdefghijklmnopqrstuvwxyzABCD",
+        "ghp_1234567890abcdefghijklmnopqrstuvwxyzABCD",
+        "xoxb-1234567890-abcdefghijklmnopqrstuvwxyz",
+        
+        // API Keys
+        "sk_live_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "pk_test_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+        "ak_live_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "pk_live_51234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        
+        // Session Tokens
+        "sess_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "session_id_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "token_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "auth_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        
+        // License Keys
+        "LICENSE-1234-5678-90AB-CDEF",
+        "KEY-ABCD-EFGH-IJKL-MNOP",
+        "PREMIUM-1234-5678-9012-3456",
+        "ENTERPRISE-ABCD-EFGH-IJKL",
+        
+        // Security Tokens
+        "sec_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "security_token_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "access_token_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "refresh_token_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        
+        // Encrypted Tokens
+        "U2FsdGVkX1/1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "AES256:1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "BASE64:1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "ENC:1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    };
+
+    static const char* const fake_hwids[] = {
+        // Windows SIDs
+        "S-1-5-21-3623811015-3361044348-30300820-1013",
+        "S-1-5-21-1234567890-1234567890-1234567890-1001",
+        "S-1-5-21-2222222222-3333333333-4444444444-5555",
+        "S-1-5-21-9999999999-8888888888-7777777777-6666",
+        "S-1-5-21-1111111111-2222222222-3333333333-4444",
+        
+        // GUIDs
+        "B59BEB45-5557-1234-ABCD-12345ABCDEF0",
+        "4876-A012-B345-C678-D901-E234-F567-G890",
+        "BFEBFBFF000A0671-01D7641CC6F9E860",
+        "A1B2C3D4-E5F6-4321-ABCD-0123456789AB",
+        "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
+        
+        // Hardware IDs
+        "PCI\\VEN_10DE&DEV_2484&SUBSYS_39883842",
+        "ACPI\\GENUINEINTEL_-_INTEL64",
+        "USB\\VID_046D&PID_C52B&REV_2400",
+        "DISPLAY\\DELA135\\5&2F4DCAFD&0&UID4352",
+        "HID\\VID_046D&PID_C52B&REV_1200",
+        
+        // MAC Addresses
+        "00:1A:2B:3C:4D:5E",
+        "FF:FF:FF:FF:FF:FF",
+        "01:23:45:67:89:AB",
+        "AA:BB:CC:DD:EE:FF",
+        "00:00:00:00:00:00",
+        
+        // CPU IDs
+        "BFEBFBFF000A0671",
+        "0178BFBFF00100F92",
+        "178BFBFF00100F92",
+        "000306C3",
+        "00000000",
+        
+        // Volume IDs
+        "A8C3-D5E7",
+        "1234-5678",
+        "ABCD-EFGH",
+        "9876-5432",
+        "FFFF-FFFF",
+        
+        // Custom Formats
+        "HW-1234-5678-90AB-CDEF",
+        "ID-ABCD-EFGH-IJKL-MNOP",
+        "HWID-1234-5678-9012-3456",
+        "MACHINE-ABCD-EFGH-IJKL",
+        "SYSTEM-1234-ABCD-5678-EFGH"
+    };
+
+    static volatile struct {
+        const char* url;
+        const char* token;
+        const char* hwid;
+        const char* response;
+    } active_session = {
+        auth_urls[0],
+        fake_tokens[0],
+        fake_hwids[0],
+        responses[0]
+    };
+}
+
+INLINE void refresh_fake_auth() {
+    while (true) {
+        int url_idx = rand() % (sizeof(fake_auth::auth_urls) / sizeof(fake_auth::auth_urls[0]));
+        int token_idx = rand() % (sizeof(fake_auth::fake_tokens) / sizeof(fake_auth::fake_tokens[0]));
+        int hwid_idx = rand() % (sizeof(fake_auth::fake_hwids) / sizeof(fake_auth::fake_hwids[0]));
+        int response_idx = rand() % (sizeof(fake_auth::responses) / sizeof(fake_auth::responses[0]));
+
+        fake_auth::active_session.url = fake_auth::auth_urls[url_idx];
+        fake_auth::active_session.token = fake_auth::fake_tokens[token_idx];
+        fake_auth::active_session.hwid = fake_auth::fake_hwids[hwid_idx];
+        fake_auth::active_session.response = fake_auth::responses[response_idx];
+
+        volatile char c = fake_auth::active_session.url[0];
+        c = fake_auth::active_session.token[0];
+        c = fake_auth::active_session.hwid[0];
+        c = fake_auth::active_session.response[0];
+    }
+}
+
+namespace crash_strings {
+    static const size_t NUM_CRASH_STRINGS = 1000;
+    static const size_t CRASH_STRING_LENGTH = 65535;
+    static char** crash_data = nullptr;
+    static size_t* string_lengths = nullptr;
+    static void** vtable_ptrs = nullptr;
+    static volatile bool is_initialized = false;
+
+    struct CrashVTable {
+        volatile void* funcs[50];
+    };
+
+    INLINE void create_recursive_vtable(CrashVTable* vtable, size_t depth) {
+        if (depth > 0) {
+            for (size_t i = 0; i < 50; i++) {
+                vtable->funcs[i] = (void*)create_recursive_vtable;
+            }
+        }
+    }
+
+    INLINE void init_crash_strings() {
+        if (is_initialized) return;
+        
+        crash_data = new char*[NUM_CRASH_STRINGS];
+        string_lengths = new size_t[NUM_CRASH_STRINGS];
+        vtable_ptrs = new void*[NUM_CRASH_STRINGS];
+
+        for (size_t i = 0; i < NUM_CRASH_STRINGS; i++) {
+            crash_data[i] = new char[CRASH_STRING_LENGTH];
+            char* current_data = crash_data[i];
+            
+            const char* prefixes[] = {
+                "https://keyauth.win/api/v1/init?key=",
+                "https://auth.secure.com/validate?token=",
+                "https://license.verify.net/check?hwid=",
+                "http://localhost:3000/debug?session="
+            };
+            const char* prefix = prefixes[i % 4];
+            strcpy_s(current_data, CRASH_STRING_LENGTH, prefix);
+            
+            size_t offset = strlen(prefix);
+            for (size_t j = offset; j < CRASH_STRING_LENGTH - sizeof(void*); j++) {
+                if (j % 16 == 0 && i > 0) {
+                    *(void**)(&current_data[j]) = crash_data[rand() % i];
+                }
+                else if (j % 8 == 0) {
+                    current_data[j] = (char)(0xD800 + (j % 0x800));
+                }
+                else if (j % 4 == 0) {
+                    current_data[j] = '\\';
+                    if (j + 1 < CRASH_STRING_LENGTH) {
+                        current_data[j + 1] = 'x';
+                    }
+                }
+                else {
+                    current_data[j] = (j % 3) ? 0 : 0xFF;
+                }
+            }
+
+            string_lengths[i] = CRASH_STRING_LENGTH * 2;
+
+            CrashVTable* vtable = new CrashVTable();
+            create_recursive_vtable(vtable, 10);
+            vtable_ptrs[i] = vtable;
+            *(void**)current_data = vtable;
+        }
+        
+        is_initialized = true;
+    }
+
+    INLINE void update_crash_strings() {
+        if (!crash_data || !is_initialized) {
+            init_crash_strings();
+            return;
+        }
+
+        static size_t counter = 0;
+        counter++;
+
+        for (size_t i = 0; i < NUM_CRASH_STRINGS; i++) {
+            char* current_data = crash_data[i];
+            if (!current_data) continue;
+
+            size_t target = (i + counter) % NUM_CRASH_STRINGS;
+            size_t offset = counter % (CRASH_STRING_LENGTH - sizeof(void*));
+            void* target_ptr = crash_data[target];
+            memcpy(&current_data[offset], &target_ptr, sizeof(void*));
+
+            string_lengths[i] = CRASH_STRING_LENGTH * ((counter + i) % 10 + 1);
+
+            volatile char c = current_data[counter % CRASH_STRING_LENGTH];
+            (void)c;
+
+            CrashVTable* vtable = (CrashVTable*)vtable_ptrs[i];
+            if (vtable) {
+                for (size_t j = 0; j < 50; j++) {
+                    vtable->funcs[j] = crash_data[(i + j) % NUM_CRASH_STRINGS];
+                }
+            }
+        }
+    }
+}
+
+#define ADD_FAKE_AUTH_STRINGS \
+    srand((unsigned int)time(NULL)); \
+    crash_strings::init_crash_strings(); \
+    std::string crash_string = std::string("\x00\xFF\x0A\x0D\x1B\x7F", 6); \
+    std::cout << crash_string << std::endl; \
+    std::string crash_stringz(10000, '\x00'); \
+    std::thread([]() { \
+        while(true) { \
+            refresh_fake_auth(); \
+            crash_strings::update_crash_strings(); \
+            Sleep(10); \
+        } \
+    }).detach()
