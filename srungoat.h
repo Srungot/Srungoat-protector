@@ -28,7 +28,7 @@
 
     Copyright (c) 2025 nizzixCR
 
-    Permission is hereby granted to any person obtaining a copy of this software (the “Software”) to use, copy, modify, and distribute both original and modified versions of the source code under the following conditions:
+    Permission is hereby granted to any person obtaining a copy of this software (the "Software") to use, copy, modify, and distribute both original and modified versions of the source code under the following conditions:
 
     1. You may:
     - Use the Software for personal, educational, or commercial purposes.
@@ -47,10 +47,10 @@
 */
 
 #define JUNK_ON_OBF 1  
-#define JUNK_ON_OBF_LEVEL 1          
+#define JUNK_ON_OBF_LEVEL 1     
 #define Name_Of_Sections_watermark ".1337"
 #define FAKE_SIGNATURES 1
-#define CALL_LEVEL 1      
+#define CALL_LEVEL 3  
 
 #ifdef _MSC_VER
     #define SECTION(x) __declspec(allocate(x))
@@ -77,7 +77,7 @@ struct REMOTE_PE_HEADER : PE_HEADER {
     ULONG_PTR remoteBaseAddress;
 };
 
-#if FAKE_SIGNATURES  // taked here https://github.com/ac3ss0r/obfusheader.h/tree/main thank you ac3ss0r
+#if FAKE_SIGNATURES         // taked here https://github.com/ac3ss0r/obfusheader.h/tree/main thank you ac3ss0r
     #ifdef _MSC_VER
         #pragma section(".arch", read)
         #pragma section(".srdata", read)
@@ -90,13 +90,227 @@ struct REMOTE_PE_HEADER : PE_HEADER {
         #pragma section(".enigma1", read)
         #pragma section(".enigma2", read)
         #pragma section(".dsstext", read)
+        #pragma section(".NIGGER", read)
+        #pragma section(".NIGGER1", read)
+        #pragma section(".NIGGER2", read)
+        #pragma section(".NIGGER3", read)
+        #pragma section(".NIGGER4", read)
+        #pragma section(".NIGGER5", read)
+        #pragma section(".SEC_0x1A", read)
+        #pragma section(".SEC_0x2B", read)
+        #pragma section(".SEC_0x3C", read)
+        #pragma section(".SEC_0x4D", read)
+        #pragma section(".SEC_0x5E", read)
+        #pragma section(".SEC_0x6F", read)
+        #pragma section(".SEC_0x7G", read)
+        #pragma section(".SEC_0x8H", read)
+        #pragma section(".SEC_0x9I", read)
+        #pragma section(".SEC_0x10J", read)
+        #pragma section(".SEC_0x11K", read)
+        #pragma section(".SEC_0x12L", read)
+        #pragma section(".SEC_0x13M", read)
+        #pragma section(".SEC_0x14N", read)
+        #pragma section(".SEC_0x15O", read)
+        #pragma section(".SEC_0x16P", read)
+        #pragma section(".SEC_0x17Q", read)
+        #pragma section(".SEC_0x18R", read)
+        #pragma section(".SEC_0x19S", read)
+        #pragma section(".SEC_0x20T", read)
+        #pragma section(".SEC_0x21U", read)
+        #pragma section(".SEC_0x22V", read)
+        #pragma section(".SEC_0x23W", read)
+        #pragma section(".SEC_0x24X", read)
+        #pragma section(".SEC_0x25Y", read)
+        #pragma section(".SEC_0x26Z", read)
+        #pragma section(".SEC_0x27AA", read)
+        #pragma section(".SEC_0x28AB", read)
+        #pragma section(".SEC_0x29AC", read)
+        #pragma section(".SEC_0x30AD", read)
+        #pragma section(".SEC_0x31AE", read)
+        #pragma section(".SEC_0x32AF", read)
+        #pragma section(".SEC_0x33AG", read)
+        #pragma section(".SEC_0x34AH", read)
+        #pragma section(".SEC_0x35AI", read)
+        #pragma section(".SEC_0x36AJ", read)
+        #pragma section(".SEC_0x37AK", read)
+        #pragma section(".SEC_0x38AL", read)
+        #pragma section(".SEC_0x39AM", read)
+        #pragma section(".SEC_0x40AN", read)
+        #pragma section(".SEC_0x41AO", read)
+        #pragma section(".SEC_0x42AP", read)
+        #pragma section(".SEC_0x43AQ", read)
+        #pragma section(".SEC_0x44AR", read)
+        #pragma section(".SEC_0x45AS", read)
+        #pragma section(".SEC_0x46AT", read)
+        #pragma section(".SEC_0x47AU", read)
+        #pragma section(".SEC_0x48AV", read)
+        #pragma section(".SEC_0x49AW", read)
+        #pragma section(".SEC_0x50AX", read)
+        #pragma section(".SEC_0x51AY", read)
+        #pragma section(".SEC_0x52AZ", read)
+        #pragma section(".SEC_0x53BA", read)
+        #pragma section(".SEC_0x54BB", read)
+        #pragma section(".SEC_0x55BC", read)
+        #pragma section(".SEC_0x56BD", read)
+        #pragma section(".SEC_0x57BE", read)
+        #pragma section(".SEC_0x58BF", read)
+        #pragma section(".SEC_0x59BG", read)
+        #pragma section(".SEC_0x60BH", read)
+        #pragma section(".SEC_0x61BI", read)
+        #pragma section(".SEC_0x62BJ", read)
+        #pragma section(".SEC_0x63BK", read)
+        #pragma section(".SEC_0x64BL", read)
+        #pragma section(".SEC_0x65BM", read)
+        #pragma section(".SEC_0x66BN", read)
+        #pragma section(".SEC_0x67BO", read)
+        #pragma section(".SEC_0x68BP", read)
+        #pragma section(".SEC_0x69BQ", read)
+        #pragma section(".SEC_0x70BR", read)
+        #pragma section(".SEC_0x71BS", read)
+        #pragma section(".SEC_0x72BT", read)
+        #pragma section(".SEC_0x73BU", read)
+        #pragma section(".SEC_0x74BV", read)
+        #pragma section(".SEC_0x75BW", read)
+        #pragma section(".SEC_0x76BX", read)
+        #pragma section(".SEC_0x77BY", read)
+        #pragma section(".SEC_0x78BZ", read)
+        #pragma section(".SEC_0x79CA", read)
+        #pragma section(".SEC_0x80CB", read)
+        #pragma section(".SEC_0x81CC", read)
+        #pragma section(".SEC_0x82CD", read)
+        #pragma section(".SEC_0x83CE", read)
+        #pragma section(".SEC_0x84CF", read)
+        #pragma section(".SEC_0x85CG", read)
+        #pragma section(".SEC_0x86CH", read)
+        #pragma section(".SEC_0x87CI", read)
+        #pragma section(".SEC_0x88CJ", read)
+        #pragma section(".SEC_0x89CK", read)
+        #pragma section(".SEC_0x90CL", read)
+        #pragma section(".SEC_0x91CM", read)
+        #pragma section(".SEC_0x92CN", read)
+        #pragma section(".SEC_0x93CO", read)
+        #pragma section(".SEC_0x94CP", read)
+        #pragma section(".SEC_0x95CQ", read)
+        #pragma section(".SEC_0x96CR", read)
+        #pragma section(".SEC_0x97CS", read)
+        #pragma section(".SEC_0x98CT", read)
+        #pragma section(".SEC_0x99CU", read)
+        #pragma section(".SEC_0x100CV", read)
     #endif
+
     FAKE_SIG(_enigma1, ".enigma1", 0); FAKE_SIG(_enigma2, ".enigma2", 0);
     FAKE_SIG(_vmp1, ".vmp0", 0); FAKE_SIG(_vmp2, ".vmp1", 0); FAKE_SIG(_vmp3, ".vmp2", 0);
     FAKE_SIG(_denuvo1, ".arch", 0); FAKE_SIG(_denuvo2, ".srdata", 0); FAKE_SIG(_denuvo3, ".xdata", 0);
     FAKE_SIG(_denuvo5, ".xtls", "\x64\x65\x6E\x75\x76\x6F\x5F\x61\x74\x64\x00\x00\x00\x00\x00\x00");
     FAKE_SIG(_themida1, ".themida", 0);
     FAKE_SIG(_securom1, ".dsstext", 0);
+    
+    FAKE_SIG(_extra1, ".NIGGER", "\x44\x45\x56\x49\x4C");  
+    FAKE_SIG(_extra2, ".NIGGER1", "\x53\x4B\x55\x4C\x4C");  
+    FAKE_SIG(_extra3, ".NIGGER2", "\x53\x45\x43\x55\x52\x45");  
+    FAKE_SIG(_extra4, ".NIGGER3", "\x46\x4C\x41\x4D\x45");  
+    FAKE_SIG(_extra5, ".NIGGER4", "\x53\x59\x53\x54\x45\x4D");  
+    FAKE_SIG(_extra6, ".NIGGER5", "\x53\x59\x53\x54\x45\x4D\x4F");  
+    FAKE_SIG(_rand1, ".SEC_0x1A", "\x50\x52\x4F\x54\x45\x43\x54"); 
+    FAKE_SIG(_rand2, ".SEC_0x2B", "\x53\x45\x43\x55\x52\x45\x44");
+    FAKE_SIG(_rand3, ".SEC_0x3C", "\x52\x49\x54\x59\x5F\x4B\x45");
+    FAKE_SIG(_rand4, ".SEC_0x4D", "\x43\x4F\x44\x45\x5F\x53\x45");
+    FAKE_SIG(_rand5, ".SEC_0x5E", "\x44\x41\x54\x41\x5F\x50\x52");
+    FAKE_SIG(_rand6, ".SEC_0x6F", "\x48\x41\x53\x48\x5F\x4B\x45");
+    FAKE_SIG(_rand7, ".SEC_0x7G", "\x43\x52\x59\x50\x54\x4F\x53");
+    FAKE_SIG(_rand8, ".SEC_0x8H", "\x53\x41\x4C\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand9, ".SEC_0x9I", "\x4B\x45\x59\x53\x5F\x53\x45");
+    FAKE_SIG(_rand10, ".SEC_0x10J", "\x42\x59\x54\x45\x5F\x43\x4F");
+    FAKE_SIG(_rand11, ".SEC_0x11K", "\x48\x45\x58\x5F\x44\x41\x54");
+    FAKE_SIG(_rand12, ".SEC_0x12L", "\x43\x4F\x44\x45\x5F\x50\x52");
+    FAKE_SIG(_rand13, ".SEC_0x13M", "\x53\x45\x43\x5F\x44\x41\x54");
+    FAKE_SIG(_rand14, ".SEC_0x14N", "\x50\x52\x4F\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand15, ".SEC_0x15O", "\x4B\x45\x59\x5F\x44\x41\x54");
+    FAKE_SIG(_rand16, ".SEC_0x16P", "\x48\x41\x53\x48\x5F\x53\x45");
+    FAKE_SIG(_rand17, ".SEC_0x17Q", "\x43\x52\x59\x50\x54\x5F\x4B");
+    FAKE_SIG(_rand18, ".SEC_0x18R", "\x53\x41\x4C\x54\x5F\x50\x52");
+    FAKE_SIG(_rand19, ".SEC_0x19S", "\x42\x59\x54\x45\x5F\x53\x45");
+    FAKE_SIG(_rand20, ".SEC_0x20T", "\x48\x45\x58\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand21, ".SEC_0x21U", "\x43\x4F\x44\x45\x5F\x4B\x45");
+    FAKE_SIG(_rand22, ".SEC_0x22V", "\x53\x45\x43\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand23, ".SEC_0x23W", "\x50\x52\x4F\x54\x5F\x53\x45");
+    FAKE_SIG(_rand24, ".SEC_0x24X", "\x4B\x45\x59\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand25, ".SEC_0x25Y", "\x48\x41\x53\x48\x5F\x44\x41");
+    FAKE_SIG(_rand26, ".SEC_0x26Z", "\x43\x52\x59\x50\x54\x5F\x53");
+    FAKE_SIG(_rand27, ".SEC_0x27AA", "\x53\x41\x4C\x54\x5F\x44\x41");
+    FAKE_SIG(_rand28, ".SEC_0x28AB", "\x42\x59\x54\x45\x5F\x50\x52");
+    FAKE_SIG(_rand29, ".SEC_0x29AC", "\x48\x45\x58\x5F\x53\x45\x43");
+    FAKE_SIG(_rand30, ".SEC_0x30AD", "\x43\x4F\x44\x45\x5F\x44\x41");
+    FAKE_SIG(_rand31, ".SEC_0x31AE", "\x53\x45\x43\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand32, ".SEC_0x32AF", "\x50\x52\x4F\x54\x5F\x44\x41");
+    FAKE_SIG(_rand33, ".SEC_0x33AG", "\x4B\x45\x59\x5F\x53\x45\x43");
+    FAKE_SIG(_rand34, ".SEC_0x34AH", "\x48\x41\x53\x48\x5F\x50\x52");
+    FAKE_SIG(_rand35, ".SEC_0x35AI", "\x43\x52\x59\x50\x54\x5F\x44");
+    FAKE_SIG(_rand36, ".SEC_0x36AJ", "\x53\x41\x4C\x54\x5F\x53\x45");
+    FAKE_SIG(_rand37, ".SEC_0x37AK", "\x42\x59\x54\x45\x5F\x44\x41");
+    FAKE_SIG(_rand38, ".SEC_0x38AL", "\x48\x45\x58\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand39, ".SEC_0x39AM", "\x43\x4F\x44\x45\x5F\x53\x45");
+    FAKE_SIG(_rand40, ".SEC_0x40AN", "\x53\x45\x43\x5F\x44\x41\x54");
+    FAKE_SIG(_rand41, ".SEC_0x41AO", "\x50\x52\x4F\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand42, ".SEC_0x42AP", "\x4B\x45\x59\x5F\x44\x41\x54");
+    FAKE_SIG(_rand43, ".SEC_0x43AQ", "\x48\x41\x53\x48\x5F\x53\x45");
+    FAKE_SIG(_rand44, ".SEC_0x44AR", "\x43\x52\x59\x50\x54\x5F\x4B");
+    FAKE_SIG(_rand45, ".SEC_0x45AS", "\x53\x41\x4C\x54\x5F\x50\x52");
+    FAKE_SIG(_rand46, ".SEC_0x46AT", "\x42\x59\x54\x45\x5F\x53\x45");
+    FAKE_SIG(_rand47, ".SEC_0x47AU", "\x48\x45\x58\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand48, ".SEC_0x48AV", "\x43\x4F\x44\x45\x5F\x4B\x45");
+    FAKE_SIG(_rand49, ".SEC_0x49AW", "\x53\x45\x43\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand50, ".SEC_0x50AX", "\x50\x52\x4F\x54\x5F\x53\x45");
+    FAKE_SIG(_rand51, ".SEC_0x51AY", "\x4B\x45\x59\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand52, ".SEC_0x52AZ", "\x48\x41\x53\x48\x5F\x44\x41");
+    FAKE_SIG(_rand53, ".SEC_0x53BA", "\x43\x52\x59\x50\x54\x5F\x53");
+    FAKE_SIG(_rand54, ".SEC_0x54BB", "\x53\x41\x4C\x54\x5F\x44\x41");
+    FAKE_SIG(_rand55, ".SEC_0x55BC", "\x42\x59\x54\x45\x5F\x50\x52");
+    FAKE_SIG(_rand56, ".SEC_0x56BD", "\x48\x45\x58\x5F\x53\x45\x43");
+    FAKE_SIG(_rand57, ".SEC_0x57BE", "\x43\x4F\x44\x45\x5F\x44\x41");
+    FAKE_SIG(_rand58, ".SEC_0x58BF", "\x53\x45\x43\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand59, ".SEC_0x59BG", "\x50\x52\x4F\x54\x5F\x44\x41");
+    FAKE_SIG(_rand60, ".SEC_0x60BH", "\x4B\x45\x59\x5F\x53\x45\x43");
+    FAKE_SIG(_rand61, ".SEC_0x61BI", "\x48\x41\x53\x48\x5F\x50\x52");
+    FAKE_SIG(_rand62, ".SEC_0x62BJ", "\x43\x52\x59\x50\x54\x5F\x44");
+    FAKE_SIG(_rand63, ".SEC_0x63BK", "\x53\x41\x4C\x54\x5F\x53\x45");
+    FAKE_SIG(_rand64, ".SEC_0x64BL", "\x42\x59\x54\x45\x5F\x44\x41");
+    FAKE_SIG(_rand65, ".SEC_0x65BM", "\x48\x45\x58\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand66, ".SEC_0x66BN", "\x43\x4F\x44\x45\x5F\x53\x45");
+    FAKE_SIG(_rand67, ".SEC_0x67BO", "\x53\x45\x43\x5F\x44\x41\x54");
+    FAKE_SIG(_rand68, ".SEC_0x68BP", "\x50\x52\x4F\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand69, ".SEC_0x69BQ", "\x4B\x45\x59\x5F\x44\x41\x54");
+    FAKE_SIG(_rand70, ".SEC_0x70BR", "\x48\x41\x53\x48\x5F\x53\x45");
+    FAKE_SIG(_rand71, ".SEC_0x71BS", "\x43\x52\x59\x50\x54\x5F\x4B");
+    FAKE_SIG(_rand72, ".SEC_0x72BT", "\x53\x41\x4C\x54\x5F\x50\x52");
+    FAKE_SIG(_rand73, ".SEC_0x73BU", "\x42\x59\x54\x45\x5F\x53\x45");
+    FAKE_SIG(_rand74, ".SEC_0x74BV", "\x48\x45\x58\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand75, ".SEC_0x75BW", "\x43\x4F\x44\x45\x5F\x4B\x45");
+    FAKE_SIG(_rand76, ".SEC_0x76BX", "\x53\x45\x43\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand77, ".SEC_0x77BY", "\x50\x52\x4F\x54\x5F\x53\x45");
+    FAKE_SIG(_rand78, ".SEC_0x78BZ", "\x4B\x45\x59\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand79, ".SEC_0x79CA", "\x48\x41\x53\x48\x5F\x44\x41");
+    FAKE_SIG(_rand80, ".SEC_0x80CB", "\x43\x52\x59\x50\x54\x5F\x53");
+    FAKE_SIG(_rand81, ".SEC_0x81CC", "\x53\x41\x4C\x54\x5F\x44\x41");
+    FAKE_SIG(_rand82, ".SEC_0x82CD", "\x42\x59\x54\x45\x5F\x50\x52");
+    FAKE_SIG(_rand83, ".SEC_0x83CE", "\x48\x45\x58\x5F\x53\x45\x43");
+    FAKE_SIG(_rand84, ".SEC_0x84CF", "\x43\x4F\x44\x45\x5F\x44\x41");
+    FAKE_SIG(_rand85, ".SEC_0x85CG", "\x53\x45\x43\x5F\x4B\x45\x59");
+    FAKE_SIG(_rand86, ".SEC_0x86CH", "\x50\x52\x4F\x54\x5F\x44\x41");
+    FAKE_SIG(_rand87, ".SEC_0x87CI", "\x4B\x45\x59\x5F\x53\x45\x43");
+    FAKE_SIG(_rand88, ".SEC_0x88CJ", "\x48\x41\x53\x48\x5F\x50\x52");
+    FAKE_SIG(_rand89, ".SEC_0x89CK", "\x43\x52\x59\x50\x54\x5F\x44");
+    FAKE_SIG(_rand90, ".SEC_0x90CL", "\x53\x41\x4C\x54\x5F\x53\x45");
+    FAKE_SIG(_rand91, ".SEC_0x91CM", "\x42\x59\x54\x45\x5F\x44\x41");
+    FAKE_SIG(_rand92, ".SEC_0x92CN", "\x48\x45\x58\x5F\x50\x52\x4F");
+    FAKE_SIG(_rand93, ".SEC_0x93CO", "\x43\x4F\x44\x45\x5F\x53\x45");
+    FAKE_SIG(_rand94, ".SEC_0x94CP", "\x53\x45\x43\x5F\x44\x41\x54");
+    FAKE_SIG(_rand95, ".SEC_0x95CQ", "\x50\x52\x4F\x54\x5F\x4B\x45");
+    FAKE_SIG(_rand96, ".SEC_0x96CR", "\x4B\x45\x59\x5F\x44\x41\x54");
+    FAKE_SIG(_rand97, ".SEC_0x97CS", "\x48\x41\x53\x48\x5F\x53\x45");
+    FAKE_SIG(_rand98, ".SEC_0x98CT", "\x43\x52\x59\x50\x54\x5F\x4B");
+    FAKE_SIG(_rand99, ".SEC_0x99CU", "\x53\x41\x4C\x54\x5F\x50\x52");
+    FAKE_SIG(_rand100, ".SEC_0x100CV", "\x42\x59\x54\x45\x5F\x53\x45");
 #endif
 
 #pragma section(Name_Of_Sections_watermark, read)
@@ -116,7 +330,7 @@ struct REMOTE_PE_HEADER : PE_HEADER {
 #define INTEGRITY_CHECK_FUNC_NAME ________________________________
 #define START_INTEGRITY_CHECK std::thread([]() { INTEGRITY_CHECK_FUNC_NAME(); }).detach()
 
-DWORD64 Function_Address;
+DWORD64 Function_Addressz;
 volatile int chaos_seed = 10003;
 
 #include <winternl.h>
@@ -349,6 +563,8 @@ inline uint32_t rotl32(uint32_t x, unsigned int n) {
 } while(0)
 
 #define BUG_IDA do { \
+    ULTRA_MEGA_JUNK(0); \
+    Junkyyyyyyy(0); \
     ULTRA_MEGA_JUNK(0); \
     Junkyyyyyyy(0); \
     ULTRA_MEGA_JUNK(0); \
@@ -722,7 +938,7 @@ bool bDataCompare(const BYTE* pData, const BYTE* bMask, const char* szMask)
     return (*szMask) == 0;
 }
 
-DWORD64 FindPattern(BYTE* bMask, const char* szMask)
+DWORD64 FindPatternz(BYTE* bMask, const char* szMask)
 {
     MODULEINFO mi{ };
     GetModuleInformation(GetCurrentProcess(), GetModuleHandleA(NULL), &mi, sizeof(mi));
@@ -755,7 +971,7 @@ void error(std::string& message) {
     error(std::string(message));
 }
 
-auto check_section_integrity(const char* section_name, bool fix = false) -> bool
+auto check_section_integrityz(const char* section_name, bool fix = false) -> bool
 {
     const auto hmodule = GetModuleHandle(0);
     if (!hmodule) {
@@ -785,9 +1001,9 @@ auto check_section_integrity(const char* section_name, bool fix = false) -> bool
 
     wchar_t filename[MAX_PATH];
     DWORD size = MAX_PATH;
-    QueryFullProcessImageName(GetCurrentProcess(), 0, filename, &size);
+    QueryFullProcessImageNameW(GetCurrentProcess(), 0, filename, &size);
 
-    const auto file_handle = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    const auto file_handle = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (!file_handle || file_handle == INVALID_HANDLE_VALUE) {
         error(OBF("Memory integrity check failed: Unable to open process file"));
         return true;
@@ -875,7 +1091,7 @@ auto check_section_integrity(const char* section_name, bool fix = false) -> bool
     return patched;
 }
 
-std::string checksum()
+std::string checksumz()
 {
     auto exec = [&](const char* cmd) -> std::string
         {
@@ -906,7 +1122,7 @@ std::string checksum()
 #include <aclapi.h>
 #include <bcrypt.h>
 
-inline bool LockMemAccess()
+inline bool LockMemAccessz()
 {
     bool bSuccess = false;
     HANDLE hToken = nullptr;
@@ -997,7 +1213,7 @@ Cleanup:
     return bSuccess;
 }
 
-bool checkAcceleratorIntegrity() {
+bool checkAcceleratorIntegrityz() {
     HMODULE hModule = GetModuleHandle(NULL);
     HRSRC hRsrc = FindResource(hModule, MAKEINTRESOURCE(1), RT_ACCELERATOR);
 
@@ -1010,30 +1226,30 @@ bool checkAcceleratorIntegrity() {
 
 void INTEGRITY_CHECK_FUNC_NAME()
 {
-    check_section_integrity(".text", true);
+    check_section_integrityz(".text", true);
 
     while (true)
     {
-        if (!checkAcceleratorIntegrity()) {
+        if (!checkAcceleratorIntegrityz()) {
             error(OBF("Critical security violation: Resource tampering detected"));
         }
 
-        if (check_section_integrity(".text"), false)
+        if (check_section_integrityz(".text"), false)
         {
             error(OBF("Critical security violation: Memory tampering detected"));
         }
 
-        if (!LockMemAccess())
+        if (!LockMemAccessz())
         {
             error(OBF("Critical security violation: Memory protection failure"));
         }
 
-        if (Function_Address == NULL) {
+        if (Function_Addressz == NULL) {
             BYTE pattern[] = "\x48\x89\x74\x24\x00\x57\x48\x81\xec\x00\x00\x00\x00\x49\x8b\xf0";
-            Function_Address = FindPattern(pattern, "xxxx?xxxx????xxx") - 0x5;
+            Function_Addressz = FindPatternz(pattern, "xxxx?xxxx????xxx") - 0x5;
         }
 
-        BYTE Instruction = *(BYTE*)Function_Address;
+        BYTE Instruction = *(BYTE*)Function_Addressz;
         if ((DWORD64)Instruction == 0xE9) {
             error(OBF("Critical security violation: Code execution flow compromised"));
         }
@@ -1459,7 +1675,6 @@ INLINE void anti_pause_thread() {
                             NULL))) {
                             if (suspendCount > 0) {
                                 while (ResumeThread(thread.handle) > 0) {}
-                                error(OBF("Critical security violation: Thread suspension detected!"));
                             }
                         }
                     }
@@ -1468,7 +1683,6 @@ INLINE void anti_pause_thread() {
                 DWORD exitCode;
                 if (GetExitCodeThread(thread.handle, &exitCode)) {
                     if (exitCode != STILL_ACTIVE) {
-                        error(OBF("Critical security violation: Protected thread terminated!"));
                     }
                 }
             }
@@ -1552,7 +1766,8 @@ const std::vector<std::string> system_dlls = {
     "VCRUNTIME140.DLL",
     "VCRUNTIME140_1.DLL",
     "MSVCP140.DLL",
-    "CONCRT140.DLL"
+    "CONCRT140.DLL",
+    "nvldumdx.dll"
 };
 
 bool is_system_dll(const std::string& dll_name) {
@@ -2340,3 +2555,1403 @@ void RunProtection() {
         error(OBF("Critical protection failure"));
     }
 }
+
+#define HIDE_CALL(...) \
+    [&]() { \
+        if (chaos_seed % 2) { __VA_ARGS__; } \
+    }()
+
+#define HIDE_CALL_THREAD(func) \
+    []() { \
+        if (chaos_seed % 2) { func(); } \
+    }
+
+#define HIDDEN_ENTRY_POINT(name) \
+    void __declspec(safebuffers) WINAPI name##_hidden(); \
+    void WINAPI name() { \
+        ULTRA_MEGA_JUNK(0); \
+        void (*hidden_entry)() = nullptr; \
+        hidden_entry = (void(*)())name##_hidden; \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            hidden_entry(); \
+        } else { \
+            JUNK_FUCK_IDA; \
+            hidden_entry(); \
+        } \
+    } \
+    void __declspec(safebuffers) WINAPI name##_hidden()
+
+#define DECLARE_HIDDEN_ENTRY(name) \
+    void WINAPI name(); \
+    void WINAPI name##_hidden();
+
+#define HIDDEN_ENTRY(return_type, name, ...) \
+    return_type __declspec(safebuffers) name##_hidden(__VA_ARGS__); \
+    return_type name(__VA_ARGS__) { \
+        ULTRA_MEGA_JUNK(0); \
+        return_type (*hidden_entry)(__VA_ARGS__) = nullptr; \
+        hidden_entry = (return_type(*)(__VA_ARGS__))name##_hidden; \
+        JUNK_FUCK_IDA; \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            return hidden_entry(__VA_ARGS__); \
+        } else { \
+            BUG_IDA; \
+            return hidden_entry(__VA_ARGS__); \
+        } \
+    } \
+    return_type __declspec(safebuffers) name##_hidden(__VA_ARGS__)
+
+#define HIDDEN_START_IMPL \
+    HIDDEN_ENTRY(int, WinMain, HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+
+#define HIDDEN_START \
+    HIDDEN_ENTRY(int, main)
+
+#define EXPORT_PROTECT(return_type, name, ...) \
+    return_type name##_protected(__VA_ARGS__); \
+    extern "C" __declspec(dllexport) return_type name(__VA_ARGS__) { \
+        ULTRA_MEGA_JUNK(0); \
+        return_type (*protected_func)(__VA_ARGS__) = nullptr; \
+        protected_func = (return_type(*)(__VA_ARGS__))name##_protected; \
+        JUNK_FUCK_IDA; \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            return protected_func(__VA_ARGS__); \
+        } else { \
+            BUG_IDA; \
+            return protected_func(__VA_ARGS__); \
+        } \
+    } \
+    return_type name##_protected(__VA_ARGS__)
+
+#define PROTECT_CALL(func, ...) \
+    [&]() { \
+        ULTRA_MEGA_JUNK(0); \
+        auto result = func(__VA_ARGS__); \
+        JUNK_FUCK_IDA; \
+        if (chaos_seed % 3 == 0) { \
+            BUG_IDA; \
+            return result; \
+        } else if (chaos_seed % 3 == 1) { \
+            CALL_RANDOM_JUNK; \
+            return result; \
+        } else { \
+            JUNK_VAR; \
+            return result; \
+        } \
+    }()
+
+#define PROTECT_VOID_CALL(func, ...) \
+    [&]() { \
+        ULTRA_MEGA_JUNK(0); \
+        if (chaos_seed % 3 == 0) { \
+            BUG_IDA; \
+            func(__VA_ARGS__); \
+        } else if (chaos_seed % 3 == 1) { \
+            CALL_RANDOM_JUNK; \
+            func(__VA_ARGS__); \
+        } else { \
+            JUNK_VAR; \
+            func(__VA_ARGS__); \
+        } \
+    }()
+
+#define PROTECT_CLASS_METHOD(class_name, return_type, method_name, ...) \
+    return_type method_name##_protected(__VA_ARGS__); \
+    return_type method_name(__VA_ARGS__) { \
+        ULTRA_MEGA_JUNK(0); \
+        return_type (class_name::*protected_method)(__VA_ARGS__) = &class_name::method_name##_protected; \
+        JUNK_FUCK_IDA; \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            return (this->*protected_method)(__VA_ARGS__); \
+        } else { \
+            BUG_IDA; \
+            return (this->*protected_method)(__VA_ARGS__); \
+        } \
+    } \
+    return_type method_name##_protected(__VA_ARGS__)
+
+#define PROTECT_STRING(str) \
+    [&]() { \
+        static auto protected_str = obffu::skCrypter<sizeof(str) / sizeof(str[0]), __TIME__[4], __TIME__[7], \
+            obffu::clean_type<decltype(str[0])>>((obffu::clean_type<decltype(str[0])>*)str); \
+        JUNK_VAR; \
+        return protected_str.decrypt(); \
+    }()
+
+#define PROTECT_SECTION(name) \
+    __declspec(allocate(Name_Of_Sections_watermark)) \
+    static const unsigned char name##_protected[] = { \
+        0xDE, 0xAD, 0xBE, 0xEF, \
+        0xCA, 0xFE, 0xBA, 0xBE, \
+        __TIME__[0], __TIME__[1], __TIME__[3], __TIME__[4], \
+        __DATE__[0], __DATE__[1], __DATE__[3], __DATE__[4], \
+        0xDE, 0xAD, 0xBE, 0xEF \
+    }; \
+    static void* const name##_ptr = (void*)name##_protected
+
+#define PROTECT_POINTER(ptr) \
+    [&]() { \
+        static volatile void* protected_ptr = nullptr; \
+        if (!protected_ptr) { \
+            ULTRA_MEGA_JUNK(0); \
+            protected_ptr = (void*)(ptr); \
+            JUNK_FUCK_IDA; \
+        } \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            return (decltype(ptr))protected_ptr; \
+        } else { \
+            BUG_IDA; \
+            return (decltype(ptr))protected_ptr; \
+        } \
+    }()
+
+#define PROTECT_FUNCTION_TABLE(class_name, ...) \
+    struct class_name##_vtable { \
+        void* entries[64]; \
+        class_name##_vtable() { \
+            ULTRA_MEGA_JUNK(0); \
+            void* funcs[] = { __VA_ARGS__ }; \
+            for(int i = 0; i < sizeof(funcs)/sizeof(void*); i++) { \
+                entries[i] = PROTECT_POINTER(funcs[i]); \
+            } \
+            JUNK_FUCK_IDA; \
+        } \
+        template<typename T> \
+        T get(int index) { \
+            JUNK_VAR; \
+            return (T)entries[index]; \
+        } \
+    }; \
+    static class_name##_vtable vtable_instance
+
+#define PROTECT_CODE_SEGMENT \
+    static void __declspec(safebuffers) protect_code() { \
+        BYTE* base = (BYTE*)GetModuleHandle(NULL); \
+        PIMAGE_DOS_HEADER dos = (PIMAGE_DOS_HEADER)base; \
+        PIMAGE_NT_HEADERS nt = (PIMAGE_NT_HEADERS)(base + dos->e_lfanew); \
+        PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(nt); \
+        for (WORD i = 0; i < nt->FileHeader.NumberOfSections; i++) { \
+            if (section[i].Characteristics & IMAGE_SCN_MEM_EXECUTE) { \
+                DWORD old; \
+                VirtualProtect(base + section[i].VirtualAddress, \
+                    section[i].Misc.VirtualSize, \
+                    PAGE_EXECUTE_READWRITE, &old); \
+                for (DWORD j = 0; j < section[i].Misc.VirtualSize - 1; j++) { \
+                    if (*(WORD*)(base + section[i].VirtualAddress + j) == 0xCCCC) { \
+                        *(WORD*)(base + section[i].VirtualAddress + j) = 0x9090; \
+                    } \
+                } \
+                VirtualProtect(base + section[i].VirtualAddress, \
+                    section[i].Misc.VirtualSize, old, &old); \
+            } \
+        } \
+    }
+
+#define INIT_PROTECTION \
+    JUNK_FUCK_IDA; \
+    protect_code(); \
+    START_INTEGRITY_CHECK; \
+    START_ANTI_ATTACH; \
+    START_ANTI_WINDOW_TITLE; \
+    START_JUNK_THREADS; \
+    START_ANTI_PAUSE_THREAD; \
+    START_ANTI_TERMINATE_THREAD; \
+    START_ANTI_DLL_INJECTION; \
+    START_ANTI_CODE_PATCH; \
+    START_ANTI_API_HOOK; \
+    START_ANTI_IAT_HOOK; \
+    START_ANTI_DEBUG; \
+    START_ANTI_DUMP_AND_SEH; \
+    JUNK_FUCK_IDA
+
+#define PROTECT_CRITICAL_SECTION(code) \
+    [&]() { \
+        ULTRA_MEGA_JUNK(0); \
+        static volatile bool initialized = false; \
+        static volatile void* code_ptr = nullptr; \
+        if (!initialized) { \
+            code_ptr = &&code_label; \
+            initialized = true; \
+        } \
+        if (chaos_seed % 2) { \
+            CALL_RANDOM_JUNK; \
+            goto *code_ptr; \
+        } else { \
+            BUG_IDA; \
+            goto *code_ptr; \
+        } \
+        code_label: \
+        JUNK_FUCK_IDA; \
+        code; \
+        ULTRA_MEGA_JUNK(0); \
+    }()
+
+#define KILL_PYQT_APPS \
+    std::thread([&]() { \
+        while (true) { \
+            ULTRA_MEGA_JUNK(0); \
+            HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); \
+            if (snapshot != INVALID_HANDLE_VALUE) { \
+                PROCESSENTRY32W pe32; \
+                pe32.dwSize = sizeof(pe32); \
+                if (Process32FirstW(snapshot, &pe32)) { \
+                    do { \
+                        char processName[MAX_PATH]; \
+                        wcstombs_s(nullptr, processName, pe32.szExeFile, MAX_PATH); \
+                        std::string procName = processName; \
+                        std::transform(procName.begin(), procName.end(), procName.begin(), ::tolower); \
+                        \
+                        if (procName.find("python") != std::string::npos || \
+                            procName.find("pyqt") != std::string::npos || \
+                            procName.find("pyside") != std::string::npos || \
+                            procName.find("qt5core") != std::string::npos || \
+                            procName.find("qt6core") != std::string::npos || \
+                            procName.find("qtcore") != std::string::npos || \
+                            procName.find("qtwidgets") != std::string::npos) { \
+                            \
+                            HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID); \
+                            if (hProcess != NULL) { \
+                                TerminateProcess(hProcess, 0); \
+                                CloseHandle(hProcess); \
+                            } \
+                        } \
+                    } while (Process32NextW(snapshot, &pe32)); \
+                } \
+                CloseHandle(snapshot); \
+            } \
+            CALL_RANDOM_JUNK; \
+            Sleep(100); \
+        } \
+    }).detach()
+
+#define KILL_PYQT_APPS \
+    std::thread([&]() { \
+        const std::vector<std::string> qt_dlls = { \
+            "python", "pyqt", "pyside", \
+            "qt5core", "qt6core", "qtcore", "qtwidgets", \
+            "qt5gui", "qt6gui", "qtgui", \
+            "qt5widgets", "qt6widgets", \
+            "qt5network", "qt6network", \
+            "sip", "pyqt5", "pyqt6", "pyside2", "pyside6", \
+            "qt5qml", "qt6qml", "qtqml", \
+            "qt5quick", "qt6quick", "qtquick", \
+            "qt5webengine", "qt6webengine", \
+            "qt5webkit", "qt6webkit", \
+            "qt5multimedia", "qt6multimedia", \
+            "python3", "python2", "pythonw", \
+            "qt5printsupport", "qt6printsupport", \
+            "qt5svg", "qt6svg", \
+            "qt5charts", "qt6charts" \
+        }; \
+        \
+        while (true) { \
+            ULTRA_MEGA_JUNK(0); \
+            HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); \
+            if (snapshot != INVALID_HANDLE_VALUE) { \
+                PROCESSENTRY32W pe32; \
+                pe32.dwSize = sizeof(pe32); \
+                if (Process32FirstW(snapshot, &pe32)) { \
+                    do { \
+                        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe32.th32ProcessID); \
+                        if (hProcess != NULL) { \
+                            HMODULE hMods[1024]; \
+                            DWORD cbNeeded; \
+                            bool should_kill = false; \
+                            \
+                            if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) { \
+                                for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)) && !should_kill; i++) { \
+                                    char modName[MAX_PATH]; \
+                                    if (GetModuleBaseNameA(hProcess, hMods[i], modName, sizeof(modName))) { \
+                                        std::string modNameStr = modName; \
+                                        std::transform(modNameStr.begin(), modNameStr.end(), modNameStr.begin(), ::tolower); \
+                                        \
+                                        for (const auto& dll : qt_dlls) { \
+                                            if (modNameStr.find(dll) != std::string::npos) { \
+                                                should_kill = true; \
+                                                break; \
+                                            } \
+                                        } \
+                                    } \
+                                } \
+                            } \
+                            \
+                            if (should_kill) { \
+                                HANDLE hKillProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID); \
+                                if (hKillProcess != NULL) { \
+                                    TerminateProcess(hKillProcess, 0); \
+                                    CloseHandle(hKillProcess); \
+                                } \
+                            } \
+                            CloseHandle(hProcess); \
+                        } \
+                    } while (Process32NextW(snapshot, &pe32)); \
+                } \
+                CloseHandle(snapshot); \
+            } \
+            CALL_RANDOM_JUNK; \
+            Sleep(100); \
+        } \
+    }).detach()
+
+
+INLINE bool detect_hypervisor() {
+    int cpuInfo[4] = { 0 };
+    __cpuid(cpuInfo, 1);
+    return (cpuInfo[2] & (1 << 31)) != 0;
+}
+
+INLINE bool detect_vm() {
+    bool vm = false;
+
+    const char* vm_vendors[] = {
+        "VMware",
+        "VBox",
+        "VIRTUAL",
+        "QEMU",
+        "Xen",
+        "Parallels"
+    };
+
+    HKEY hKey;
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        char keyName[256];
+        DWORD index = 0;
+        DWORD nameSize = sizeof(keyName);
+
+        while (RegEnumKeyExA(hKey, index, keyName, &nameSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+            for (const auto& vendor : vm_vendors) {
+                if (strstr(keyName, vendor)) {
+                    vm = true;
+                    break;
+                }
+            }
+            nameSize = sizeof(keyName);
+            index++;
+        }
+        RegCloseKey(hKey);
+    }
+
+    return vm;
+}
+
+INLINE void anti_vm() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        if (detect_hypervisor() || detect_vm()) {
+            error(OBF("Virtual Machine detected!"));
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(100);
+    }
+}
+
+#define START_ANTI_VM std::thread([]() { anti_vm(); }).detach()
+
+INLINE void protect_memory_regions() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        MEMORY_BASIC_INFORMATION mbi;
+        PVOID address = 0;
+
+        while (VirtualQuery(address, &mbi, sizeof(mbi))) {
+            if (mbi.State == MEM_COMMIT &&
+                (mbi.Type == MEM_PRIVATE || mbi.Type == MEM_IMAGE)) {
+
+                DWORD oldProtect;
+                if (mbi.Protect & PAGE_EXECUTE ||
+                    mbi.Protect & PAGE_EXECUTE_READ ||
+                    mbi.Protect & PAGE_EXECUTE_READWRITE) {
+
+                    VirtualProtect(mbi.BaseAddress, mbi.RegionSize,
+                        PAGE_EXECUTE_READ, &oldProtect);
+                }
+            }
+            address = (PVOID)((DWORD_PTR)mbi.BaseAddress + mbi.RegionSize);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(100);
+    }
+}
+
+#define START_MEMORY_PROTECTION std::thread([]() { protect_memory_regions(); }).detach()
+
+struct SystemCall {
+    const char* name;
+    PVOID* address;
+    BYTE originalBytes[16];
+};
+
+std::vector<SystemCall> protected_syscalls;
+std::mutex syscalls_mutex;
+
+INLINE void protect_system_calls() {
+    const char* critical_syscalls[] = {
+        "NtCreateFile",
+        "NtOpenFile",
+        "NtReadFile",
+        "NtWriteFile",
+        "NtDeviceIoControlFile",
+        "NtQuerySystemInformation",
+        "NtQueryInformationProcess",
+        "NtSetInformationProcess"
+    };
+
+    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+    if (!ntdll) return;
+
+    for (const auto& syscall : critical_syscalls) {
+        PVOID addr = GetProcAddress(ntdll, syscall);
+        if (addr) {
+            SystemCall sc;
+            sc.name = syscall;
+            sc.address = (PVOID*)addr;
+            memcpy(sc.originalBytes, addr, 16);
+            protected_syscalls.push_back(sc);
+        }
+    }
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        std::lock_guard<std::mutex> lock(syscalls_mutex);
+        for (auto& syscall : protected_syscalls) {
+            if (memcmp(syscall.address, syscall.originalBytes, 16) != 0) {
+                DWORD oldProtect;
+                VirtualProtect(syscall.address, 16, PAGE_EXECUTE_READWRITE, &oldProtect);
+                memcpy(syscall.address, syscall.originalBytes, 16);
+                VirtualProtect(syscall.address, 16, oldProtect, &oldProtect);
+                error(OBF("System call hook detected and removed: ") + std::string(syscall.name));
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_SYSCALL_PROTECTION std::thread([]() { protect_system_calls(); }).detach()
+
+struct ApcContext {
+    PAPCFUNC apcFunction;
+    HANDLE threadHandle;
+    DWORD threadId;
+};
+
+std::vector<ApcContext> legitimate_apcs;
+std::mutex apc_mutex;
+
+INLINE void anti_apc_injection() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if (hThreadSnap != INVALID_HANDLE_VALUE) {
+            THREADENTRY32 te32;
+            te32.dwSize = sizeof(THREADENTRY32);
+
+            if (Thread32First(hThreadSnap, &te32)) {
+                do {
+                    if (te32.th32OwnerProcessID == GetCurrentProcessId()) {
+                        HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, te32.th32ThreadID);
+                        if (hThread) {
+                            CONTEXT ctx = { 0 };
+                            ctx.ContextFlags = CONTEXT_ALL;
+
+                            if (GetThreadContext(hThread, &ctx)) {
+                                if (ctx.Dr0 != 0 || ctx.Dr1 != 0 || ctx.Dr2 != 0 || ctx.Dr3 != 0) {
+                                    error(OBF("APC injection attempt detected!"));
+                                }
+                            }
+
+                            CloseHandle(hThread);
+                        }
+                    }
+                } while (Thread32Next(hThreadSnap, &te32));
+            }
+            CloseHandle(hThreadSnap);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_ANTI_APC std::thread([]() { anti_apc_injection(); }).detach()
+
+#pragma pack(push, 1)
+struct GDT_DESCRIPTOR {
+    WORD Limit;
+    DWORD64 Base;
+};
+
+struct GDT_ENTRY {
+    WORD LimitLow;
+    WORD BaseLow;
+    BYTE BaseMid;
+    BYTE Access;
+    BYTE LimitHigh : 4;
+    BYTE Flags : 4;
+    BYTE BaseHigh;
+};
+
+struct SEGMENT_DESCRIPTOR {
+    DWORD64 Base;
+    DWORD Limit;
+    union {
+        struct {
+            WORD Type : 4;
+            WORD S : 1;
+            WORD DPL : 2;
+            WORD P : 1;
+            WORD AVL : 1;
+            WORD L : 1;
+            WORD DB : 1;
+            WORD G : 1;
+            WORD Reserved : 4;
+        };
+        WORD Flags;
+    };
+};
+#pragma pack(pop)
+
+struct GdtEntry {
+    DWORD64 base;
+    DWORD limit;
+    WORD selector;
+    BYTE access;
+    BYTE flags;
+};
+
+std::vector<GdtEntry> original_gdt;
+std::mutex gdt_mutex;
+
+extern "C" void _sgdt(void*);
+#pragma intrinsic(_sgdt)
+
+INLINE void protect_gdt() {
+    GDT_DESCRIPTOR gdtr = { 0 };
+    _sgdt(&gdtr);
+
+    GDT_ENTRY* gdtBase = reinterpret_cast<GDT_ENTRY*>(gdtr.Base);
+    WORD gdtLimit = gdtr.Limit;
+
+    if (!gdtBase || gdtLimit == 0) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(gdt_mutex);
+    original_gdt.clear();
+
+    for (WORD i = 0; i < (gdtLimit + 1) / sizeof(GDT_ENTRY); i++) {
+        GdtEntry entry;
+        entry.base = gdtBase[i].BaseLow |
+            ((DWORD64)gdtBase[i].BaseMid << 16) |
+            ((DWORD64)gdtBase[i].BaseHigh << 24);
+        entry.limit = gdtBase[i].LimitLow |
+            ((DWORD)gdtBase[i].LimitHigh << 16);
+        entry.selector = i * 8;
+        entry.access = gdtBase[i].Access;
+        entry.flags = gdtBase[i].Flags;
+        original_gdt.push_back(entry);
+    }
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        GDT_DESCRIPTOR current_gdtr = { 0 };
+        _sgdt(&current_gdtr);
+
+        if (current_gdtr.Base != gdtr.Base || current_gdtr.Limit != gdtr.Limit) {
+            error(OBF("GDT base or limit modification detected!"));
+            continue;
+        }
+
+        GDT_ENTRY* currentGdtBase = reinterpret_cast<GDT_ENTRY*>(current_gdtr.Base);
+        if (!currentGdtBase) {
+            continue;
+        }
+
+        for (WORD i = 0; i < (gdtLimit + 1) / sizeof(GDT_ENTRY); i++) {
+            DWORD64 currentBase = currentGdtBase[i].BaseLow |
+                ((DWORD64)currentGdtBase[i].BaseMid << 16) |
+                ((DWORD64)currentGdtBase[i].BaseHigh << 24);
+            DWORD currentLimit = currentGdtBase[i].LimitLow |
+                ((DWORD)currentGdtBase[i].LimitHigh << 16);
+            BYTE currentAccess = currentGdtBase[i].Access;
+            BYTE currentFlags = currentGdtBase[i].Flags;
+
+            if (currentBase != original_gdt[i].base ||
+                currentLimit != original_gdt[i].limit ||
+                currentAccess != original_gdt[i].access ||
+                currentFlags != original_gdt[i].flags) {
+                error(OBF("GDT entry modification detected!"));
+
+                DWORD oldProtect;
+                if (VirtualProtect(&currentGdtBase[i], sizeof(GDT_ENTRY), PAGE_READWRITE, &oldProtect)) {
+                    currentGdtBase[i].BaseLow = (WORD)(original_gdt[i].base & 0xFFFF);
+                    currentGdtBase[i].BaseMid = (BYTE)((original_gdt[i].base >> 16) & 0xFF);
+                    currentGdtBase[i].BaseHigh = (BYTE)((original_gdt[i].base >> 24) & 0xFF);
+                    currentGdtBase[i].LimitLow = (WORD)(original_gdt[i].limit & 0xFFFF);
+                    currentGdtBase[i].LimitHigh = (original_gdt[i].limit >> 16) & 0x0F;
+                    currentGdtBase[i].Access = original_gdt[i].access;
+                    currentGdtBase[i].Flags = original_gdt[i].flags;
+                    VirtualProtect(&currentGdtBase[i], sizeof(GDT_ENTRY), oldProtect, &oldProtect);
+                }
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_GDT_PROTECTION std::thread([]() { protect_gdt(); }).detach()
+
+struct DebugRegisterState {
+    DWORD64 dr0;
+    DWORD64 dr1;
+    DWORD64 dr2;
+    DWORD64 dr3;
+    DWORD64 dr6;
+    DWORD64 dr7;
+};
+
+std::vector<DebugRegisterState> thread_debug_states;
+std::mutex debug_reg_mutex;
+
+INLINE void protect_debug_registers() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        if (hThreadSnap != INVALID_HANDLE_VALUE) {
+            THREADENTRY32 te32;
+            te32.dwSize = sizeof(THREADENTRY32);
+
+            if (Thread32First(hThreadSnap, &te32)) {
+                do {
+                    if (te32.th32OwnerProcessID == GetCurrentProcessId()) {
+                        HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, te32.th32ThreadID);
+                        if (hThread) {
+                            CONTEXT ctx = { 0 };
+                            ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+
+                            if (GetThreadContext(hThread, &ctx)) {
+                                if (ctx.Dr0 != 0 || ctx.Dr1 != 0 ||
+                                    ctx.Dr2 != 0 || ctx.Dr3 != 0 ||
+                                    ctx.Dr6 != 0 || ctx.Dr7 != 0) {
+
+                                    ctx.Dr0 = ctx.Dr1 = ctx.Dr2 = ctx.Dr3 = 0;
+                                    ctx.Dr6 = ctx.Dr7 = 0;
+                                    SetThreadContext(hThread, &ctx);
+
+                                    error(OBF("Debug register modification detected and cleared!"));
+                                }
+                            }
+                            CloseHandle(hThread);
+                        }
+                    }
+                } while (Thread32Next(hThreadSnap, &te32));
+            }
+            CloseHandle(hThreadSnap);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_DEBUG_REG_PROTECTION std::thread([]() { protect_debug_registers(); }).detach()
+
+#pragma pack(push, 1)
+struct IDT_DESCRIPTOR {
+    WORD Limit;
+    DWORD64 Base;
+};
+
+struct IDT_ENTRY {
+    WORD OffsetLow;
+    WORD Selector;
+    BYTE Reserved;
+    BYTE Type;
+    WORD OffsetMiddle;
+    DWORD OffsetHigh;
+    DWORD Reserved2;
+};
+#pragma pack(pop)
+
+std::vector<IDT_ENTRY> original_idt;
+std::mutex idt_mutex;
+
+INLINE void protect_idt() {
+    IDT_DESCRIPTOR idtr = { 0 };
+    __sidt(&idtr);
+
+    IDT_ENTRY* idtBase = reinterpret_cast<IDT_ENTRY*>(idtr.Base);
+    WORD idtLimit = idtr.Limit;
+
+    std::lock_guard<std::mutex> lock(idt_mutex);
+    original_idt.assign(idtBase, idtBase + (idtLimit + 1) / sizeof(IDT_ENTRY));
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        IDT_DESCRIPTOR current_idtr = { 0 };
+        __sidt(&current_idtr);
+
+        if (current_idtr.Base != idtr.Base || current_idtr.Limit != idtr.Limit) {
+            error(OBF("IDT modification detected!"));
+            continue;
+        }
+
+        IDT_ENTRY* currentIdtBase = reinterpret_cast<IDT_ENTRY*>(current_idtr.Base);
+        for (size_t i = 0; i < original_idt.size(); i++) {
+            if (memcmp(&currentIdtBase[i], &original_idt[i], sizeof(IDT_ENTRY)) != 0) {
+                error(OBF("IDT entry modification detected!"));
+                DWORD oldProtect;
+                if (VirtualProtect(&currentIdtBase[i], sizeof(IDT_ENTRY), PAGE_READWRITE, &oldProtect)) {
+                    memcpy(&currentIdtBase[i], &original_idt[i], sizeof(IDT_ENTRY));
+                    VirtualProtect(&currentIdtBase[i], sizeof(IDT_ENTRY), oldProtect, &oldProtect);
+                }
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_IDT_PROTECTION std::thread([]() { protect_idt(); }).detach()
+
+struct PageEntry {
+    PVOID address;
+    DWORD protection;
+    SIZE_T size;
+    std::vector<BYTE> content;
+};
+
+std::vector<PageEntry> protected_pages;
+std::mutex page_mutex;
+
+INLINE void protect_pages() {
+    SYSTEM_INFO sysInfo;
+    GetSystemInfo(&sysInfo);
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        MEMORY_BASIC_INFORMATION mbi;
+        PVOID address = 0;
+
+        std::lock_guard<std::mutex> lock(page_mutex);
+
+        while (VirtualQuery(address, &mbi, sizeof(mbi))) {
+            if (mbi.State == MEM_COMMIT &&
+                (mbi.Type == MEM_PRIVATE || mbi.Type == MEM_IMAGE)) {
+
+                auto it = std::find_if(protected_pages.begin(), protected_pages.end(),
+                    [&](const PageEntry& entry) { return entry.address == mbi.BaseAddress; });
+
+                if (it != protected_pages.end()) {
+                    std::vector<BYTE> currentContent(it->size);
+                    SIZE_T bytesRead;
+                    if (ReadProcessMemory(GetCurrentProcess(), it->address,
+                        currentContent.data(), it->size, &bytesRead)) {
+
+                        if (memcmp(currentContent.data(), it->content.data(), it->size) != 0) {
+                            error(OBF("Memory page modification detected!"));
+                            DWORD oldProtect;
+                            if (VirtualProtect(it->address, it->size, PAGE_READWRITE, &oldProtect)) {
+                                memcpy(it->address, it->content.data(), it->size);
+                                VirtualProtect(it->address, it->size, it->protection, &oldProtect);
+                            }
+                        }
+                    }
+                }
+            }
+            address = (PVOID)((DWORD_PTR)mbi.BaseAddress + mbi.RegionSize);
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_PAGE_PROTECTION std::thread([]() { protect_pages(); }).detach()
+
+struct KernelCallback {
+    PVOID address;
+    BYTE originalBytes[32];
+};
+
+std::vector<KernelCallback> protected_callbacks;
+std::mutex callback_mutex;
+
+INLINE void protect_kernel_callbacks() {
+    const PVOID callbacks[] = {
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserExceptionDispatcher"),
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserApcDispatcher"),
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserCallbackDispatcher")
+    };
+
+    for (PVOID callback : callbacks) {
+        if (callback) {
+            KernelCallback cb;
+            cb.address = callback;
+            memcpy(cb.originalBytes, callback, sizeof(cb.originalBytes));
+            protected_callbacks.push_back(cb);
+        }
+    }
+
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+
+        std::lock_guard<std::mutex> lock(callback_mutex);
+        for (auto& callback : protected_callbacks) {
+            if (memcmp(callback.address, callback.originalBytes, sizeof(callback.originalBytes)) != 0) {
+                error(OBF("Kernel callback modification detected!"));
+                DWORD oldProtect;
+                if (VirtualProtect(callback.address, sizeof(callback.originalBytes),
+                    PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                    memcpy(callback.address, callback.originalBytes, sizeof(callback.originalBytes));
+                    VirtualProtect(callback.address, sizeof(callback.originalBytes),
+                        oldProtect, &oldProtect);
+                }
+            }
+        }
+
+        CALL_RANDOM_JUNK;
+        Sleep(50);
+    }
+}
+
+#define START_KERNEL_CALLBACK_PROTECTION std::thread([]() { protect_kernel_callbacks(); }).detach()
+
+struct LibraryInfo {
+    std::string path;
+    DWORD64 baseAddress;
+    SIZE_T imageSize;
+    std::vector<BYTE> headerHash;
+    std::vector<BYTE> codeHash;
+};
+
+std::vector<LibraryInfo> protected_libraries;
+std::mutex libraries_mutex;
+
+namespace fake_auth {
+    static const char* const auth_urls[] = {
+        // KeyAuth URLs
+        "https://keyauth.win/api/1.0/init?ver=1.0&hash=",
+        "https://keyauth.com/api/v2/check?session=",
+        "https://keyauth.cc/api/v3/validate?license=",
+        "https://keyauth.pro/panel/admin?token=",
+        "https://keyauth.cloud/api/1.2/verify?key=",
+        "https://keyauth.vip/api/v2/authenticate?session=",
+        "https://keyauth.app/api/v1/check?license=",
+        "https://api.keyauth.ru/v2/validate?token=",
+        "https://panel.keyauth.cc/admin/verify?key=",
+        "https://auth.keyauth.win/v3/check?hwid=",
+        
+        // FluxAuth URLs
+        "https://fluxauth.com/api/check?key=",
+        "https://fluxauth.net/api/verify?hwid=",
+        "https://fluxauth.cc/panel/reseller?user=",
+        "https://fluxauth.io/api/session?auth=",
+        "https://api.fluxauth.net/v2/validate?token=",
+        "https://panel.fluxauth.com/admin/check?key=",
+        "https://auth.fluxauth.io/v1/verify?license=",
+        "https://flux-auth.com/api/v3/init?session=",
+        "https://fluxauth.org/dashboard/user?id=",
+        "https://secure.fluxauth.net/api/check?hwid=",
+        
+        // Auth Systems
+        "https://authifly.com/api/v1/check?license=",
+        "https://authifly.cc/panel/customer?id=",
+        "https://authifly.net/api/validate?token=",
+        "https://authifly.co/dashboard?session=",
+        "https://auth-panel.com/api/v2/init?ver=",
+        "https://auth-service.net/api/check?hwid=",
+        "https://auth-system.io/api/v3/verify?key=",
+        "https://auth-protect.com/panel/validate?token=",
+        "https://auth-secure.net/api/v2/check?license=",
+        "https://auth-guard.cc/api/v1/session?hwid=",
+        
+        // License Systems
+        "https://license-api.com/v1/verify?key=",
+        "https://license.secure.com/api/check?token=",
+        "https://license-system.net/api/v2/validate?key=",
+        "https://license.auth.io/v3/verify?hwid=",
+        "https://licensing.pro/api/v1/check?session=",
+        "https://license-guard.com/panel/verify?key=",
+        "https://secure-license.net/api/validate?token=",
+        "https://license.protection.cc/v2/check?id=",
+        "https://license-verify.com/api/auth?key=",
+        "https://license.shield.io/api/v3/validate?hwid=",
+        
+        // CryptAuth URLs
+        "https://cryptauth.com/api/v3/check?uid=",
+        "https://cryptauth.net/panel/admin?token=",
+        "https://cryptauth.io/api/validate?license=",
+        "https://cryptauth.cc/dashboard?session=",
+        "https://api.cryptauth.net/v2/verify?key=",
+        "https://panel.cryptauth.com/admin/check?hwid=",
+        "https://auth.cryptauth.io/v1/session?token=",
+        "https://secure.cryptauth.cc/api/v3/validate?id=",
+        "https://crypt-auth.com/panel/user?license=",
+        "https://cryptauth.org/api/v2/init?auth=",
+        
+        // SecureAuth URLs
+        "https://secureauth.win/api/v2/verify?key=",
+        "https://secure-auth.com/api/v1/check?token=",
+        "https://secureauth.cc/panel/validate?hwid=",
+        "https://secureauth.io/api/v3/session?id=",
+        "https://api.secureauth.net/v2/auth?license=",
+        "https://panel.secureauth.com/admin/verify?key=",
+        "https://auth.secureauth.cc/v1/validate?token=",
+        "https://secure.auth-api.com/v3/check?hwid=",
+        "https://secureauth.cloud/api/v2/init?session=",
+        "https://security-auth.com/panel/user?key=",
+        
+        // Protection Systems
+        "https://protect-auth.com/api/v1/verify?key=",
+        "https://protection.cc/api/v2/validate?token=",
+        "https://shield-auth.net/api/v3/check?hwid=",
+        "https://guard-system.com/panel/auth?id=",
+        "https://security-guard.io/api/v1/session?key=",
+        "https://protection-api.com/v2/verify?license=",
+        "https://shield.auth-api.net/v3/validate?token=",
+        "https://guard.secure.cc/api/v2/check?hwid=",
+        "https://protect.license.io/v1/auth?session=",
+        "https://security.shield.com/api/v3/verify?key="
+    };
+
+    static const char* const endpoints[] = {
+        // API Endpoints
+        "/api/v1/init",
+        "/api/v2/check",
+        "/api/v3/validate",
+        "/api/v1.2/verify",
+        "/api/v2.1/authenticate",
+        "/api/v3.0/session",
+        "/api/beta/validate",
+        "/api/stable/check",
+        "/api/release/verify",
+        "/api/enterprise/auth",
+        
+        // Panel Endpoints
+        "/panel/admin",
+        "/panel/reseller",
+        "/panel/customer",
+        "/panel/moderator",
+        "/panel/manager",
+        "/panel/support",
+        "/panel/developer",
+        "/panel/affiliate",
+        "/panel/partner",
+        "/panel/distributor",
+        
+        // Dashboard Endpoints
+        "/dashboard",
+        "/dashboard/home",
+        "/dashboard/users",
+        "/dashboard/licenses",
+        "/dashboard/sessions",
+        "/dashboard/analytics",
+        "/dashboard/security",
+        "/dashboard/settings",
+        "/dashboard/logs",
+        "/dashboard/webhooks",
+        
+        // Auth Endpoints
+        "/auth/login",
+        "/auth/register",
+        "/auth/verify",
+        "/auth/reset",
+        "/auth/session",
+        "/auth/token",
+        "/auth/refresh",
+        "/auth/revoke",
+        "/auth/validate",
+        "/auth/check",
+        
+        // License Endpoints
+        "/license/create",
+        "/license/verify",
+        "/license/update",
+        "/license/delete",
+        "/license/status",
+        "/license/extend",
+        "/license/transfer",
+        "/license/bind",
+        "/license/unbind",
+        "/license/history"
+    };
+
+    static const char* const params[] = {
+        // Version Parameters
+        "version=1.0",
+        "version=2.1",
+        "version=3.0",
+        "ver=1.2.3",
+        "ver=2.0.1",
+        "build=1234",
+        "build=5678",
+        "release=stable",
+        "release=beta",
+        "channel=prod",
+        
+        // Authentication Parameters
+        "hwid=",
+        "session=",
+        "token=",
+        "license=",
+        "key=",
+        "auth=",
+        "user=",
+        "client=",
+        "id=",
+        "apikey=",
+        
+        // Additional Parameters
+        "timestamp=",
+        "nonce=",
+        "signature=",
+        "hash=",
+        "checksum=",
+        "fingerprint=",
+        "device=",
+        "platform=",
+        "os=",
+        "app=",
+        
+        // Security Parameters
+        "integrity=",
+        "antitamper=",
+        "security=",
+        "protection=",
+        "encrypted=",
+        "signed=",
+        "verified=",
+        "trusted=",
+        "secure=",
+        "safe=",
+        
+        // User Parameters
+        "username=",
+        "email=",
+        "account=",
+        "profile=",
+        "role=",
+        "group=",
+        "level=",
+        "rank=",
+        "status=",
+        "type=",
+        
+        // License Parameters
+        "duration=",
+        "expiry=",
+        "created=",
+        "activated=",
+        "subscription=",
+        "plan=",
+        "package=",
+        "product=",
+        "feature=",
+        "access="
+    };
+
+    static const char* const responses[] = {
+        // Success Responses
+        "{\"success\":true,\"message\":\"Successfully authenticated\",\"token\":\"",
+        "{\"status\":\"success\",\"data\":{\"license\":\"valid\",\"expires\":\"",
+        "{\"result\":true,\"session\":\"",
+        "{\"authenticated\":true,\"user\":{\"id\":\"",
+        "{\"valid\":true,\"license\":{\"type\":\"",
+        "{\"success\":1,\"info\":{\"hwid\":\"",
+        "{\"code\":200,\"data\":{\"key\":\"",
+        "{\"ok\":true,\"response\":{\"auth\":\"",
+        "{\"status\":\"ok\",\"session\":{\"token\":\"",
+        "{\"success\":\"true\",\"license\":\"valid\",\"days\":\"",
+        
+        // Detailed Success Responses
+        "{\"success\":true,\"data\":{\"user\":{\"id\":\"\",\"username\":\"\",\"email\":\"\",\"role\":\"premium\"},\"license\":{\"key\":\"\",\"type\":\"lifetime\",\"expires\":\"never\"},\"session\":{\"token\":\"\",\"expires\":\"3600\"},\"hwid\":\"\"}}",
+        "{\"status\":\"success\",\"response\":{\"account\":{\"id\":\"\",\"level\":\"vip\",\"created\":\"2024-01-01\"},\"subscription\":{\"plan\":\"enterprise\",\"features\":[\"premium\",\"priority\"],\"active\":true},\"security\":{\"2fa\":true,\"ip_lock\":true}}}",
+        "{\"result\":\"ok\",\"auth\":{\"token\":\"\",\"refresh\":\"\",\"scope\":\"full\",\"permissions\":[\"read\",\"write\",\"admin\"]},\"user\":{\"verified\":true,\"status\":\"active\"},\"app\":{\"version\":\"1.0.0\",\"build\":\"stable\"}}",
+        
+        // Error Responses
+        "{\"success\":false,\"error\":\"Invalid license key\",\"code\":\"AUTH001\"}",
+        "{\"status\":\"error\",\"message\":\"Session expired\",\"details\":\"Please login again\"}",
+        "{\"result\":false,\"reason\":\"HWID mismatch\",\"expected\":\"",
+        "{\"error\":true,\"code\":403,\"message\":\"Access denied\",\"info\":\"IP blocked\"}",
+        "{\"success\":0,\"error\":\"Version outdated\",\"required\":\"2.0.0\"}",
+        "{\"status\":\"failed\",\"type\":\"security\",\"message\":\"Tampering detected\"}",
+        "{\"code\":401,\"error\":\"Unauthorized\",\"details\":\"Invalid token\"}",
+        
+        // Validation Responses
+        "{\"valid\":true,\"type\":\"subscription\",\"expires\":\"2025-01-01\",\"features\":[]}",
+        "{\"check\":\"passed\",\"integrity\":true,\"signature\":\"valid\",\"timestamp\":\"",
+        "{\"verification\":\"success\",\"level\":\"enterprise\",\"modules\":[\"premium\",\"business\"]}",
+        "{\"auth\":\"granted\",\"permissions\":{\"admin\":true,\"modify\":true},\"token\":\"",
+        "{\"license\":\"active\",\"plan\":\"premium\",\"restrictions\":{\"ip_lock\":true},\"key\":\"",
+        
+        // Security Responses
+        "{\"security\":{\"integrity\":\"valid\",\"tamper\":\"none\",\"debug\":\"none\",\"vm\":\"none\"}}",
+        "{\"protection\":{\"level\":\"maximum\",\"encryption\":\"enabled\",\"monitoring\":\"active\"}}",
+        "{\"system\":{\"safe\":true,\"threats\":0,\"scan\":\"completed\",\"hash\":\"",
+        "{\"environment\":{\"secure\":true,\"trusted\":true,\"verified\":true},\"token\":\"",
+        "{\"check\":{\"memory\":\"clean\",\"process\":\"verified\",\"modules\":\"valid\"},\"session\":\"" 
+    };
+
+    static const char* const fake_tokens[] = {
+        // JWT Tokens
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiQWxpY2UiLCJhZG1pbiI6dHJ1ZX0",
+        "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJzdXBlcnVzZXIiLCJwZXJtcyI6ImFsbCJ9",
+        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoicHJlbWl1bSIsInBsYW4iOiJlbnRlcnByaXNlIiwiZXhwIjoxNzA5MjkzMDIxfQ",
+        
+        // OAuth Tokens
+        "ya29.a0AfB_byC-1234567890-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "gho_1234567890abcdefghijklmnopqrstuvwxyzABCD",
+        "ghp_1234567890abcdefghijklmnopqrstuvwxyzABCD",
+        "xoxb-1234567890-abcdefghijklmnopqrstuvwxyz",
+        
+        // API Keys
+        "sk_live_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "pk_test_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+        "ak_live_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "pk_live_51234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        
+        // Session Tokens
+        "sess_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "session_id_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "token_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "auth_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        
+        // License Keys
+        "LICENSE-1234-5678-90AB-CDEF",
+        "KEY-ABCD-EFGH-IJKL-MNOP",
+        "PREMIUM-1234-5678-9012-3456",
+        "ENTERPRISE-ABCD-EFGH-IJKL",
+        
+        // Security Tokens
+        "sec_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "security_token_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "access_token_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "refresh_token_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        
+        // Encrypted Tokens
+        "U2FsdGVkX1/1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "AES256:1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "BASE64:1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "ENC:1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    };
+
+    static const char* const fake_hwids[] = {
+        // Windows SIDs
+        "S-1-5-21-3623811015-3361044348-30300820-1013",
+        "S-1-5-21-1234567890-1234567890-1234567890-1001",
+        "S-1-5-21-2222222222-3333333333-4444444444-5555",
+        "S-1-5-21-9999999999-8888888888-7777777777-6666",
+        "S-1-5-21-1111111111-2222222222-3333333333-4444",
+        
+        // GUIDs
+        "B59BEB45-5557-1234-ABCD-12345ABCDEF0",
+        "4876-A012-B345-C678-D901-E234-F567-G890",
+        "BFEBFBFF000A0671-01D7641CC6F9E860",
+        "A1B2C3D4-E5F6-4321-ABCD-0123456789AB",
+        "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
+        
+        // Hardware IDs
+        "PCI\\VEN_10DE&DEV_2484&SUBSYS_39883842",
+        "ACPI\\GENUINEINTEL_-_INTEL64",
+        "USB\\VID_046D&PID_C52B&REV_2400",
+        "DISPLAY\\DELA135\\5&2F4DCAFD&0&UID4352",
+        "HID\\VID_046D&PID_C52B&REV_1200",
+        
+        // MAC Addresses
+        "00:1A:2B:3C:4D:5E",
+        "FF:FF:FF:FF:FF:FF",
+        "01:23:45:67:89:AB",
+        "AA:BB:CC:DD:EE:FF",
+        "00:00:00:00:00:00",
+        
+        // CPU IDs
+        "BFEBFBFF000A0671",
+        "0178BFBFF00100F92",
+        "178BFBFF00100F92",
+        "000306C3",
+        "00000000",
+        
+        // Volume IDs
+        "A8C3-D5E7",
+        "1234-5678",
+        "ABCD-EFGH",
+        "9876-5432",
+        "FFFF-FFFF",
+        
+        // Custom Formats
+        "HW-1234-5678-90AB-CDEF",
+        "ID-ABCD-EFGH-IJKL-MNOP",
+        "HWID-1234-5678-9012-3456",
+        "MACHINE-ABCD-EFGH-IJKL",
+        "SYSTEM-1234-ABCD-5678-EFGH"
+    };
+
+    static volatile struct {
+        const char* url;
+        const char* token;
+        const char* hwid;
+        const char* response;
+    } active_session = {
+        auth_urls[0],
+        fake_tokens[0],
+        fake_hwids[0],
+        responses[0]
+    };
+}
+
+INLINE void refresh_fake_auth() {
+    while (true) {
+        int url_idx = rand() % (sizeof(fake_auth::auth_urls) / sizeof(fake_auth::auth_urls[0]));
+        int token_idx = rand() % (sizeof(fake_auth::fake_tokens) / sizeof(fake_auth::fake_tokens[0]));
+        int hwid_idx = rand() % (sizeof(fake_auth::fake_hwids) / sizeof(fake_auth::fake_hwids[0]));
+        int response_idx = rand() % (sizeof(fake_auth::responses) / sizeof(fake_auth::responses[0]));
+
+        fake_auth::active_session.url = fake_auth::auth_urls[url_idx];
+        fake_auth::active_session.token = fake_auth::fake_tokens[token_idx];
+        fake_auth::active_session.hwid = fake_auth::fake_hwids[hwid_idx];
+        fake_auth::active_session.response = fake_auth::responses[response_idx];
+
+        volatile char c = fake_auth::active_session.url[0];
+        c = fake_auth::active_session.token[0];
+        c = fake_auth::active_session.hwid[0];
+        c = fake_auth::active_session.response[0];
+    }
+}
+
+namespace crash_strings {
+    static const size_t NUM_CRASH_STRINGS = 1000;
+    static const size_t CRASH_STRING_LENGTH = 65535;
+    static char** crash_data = nullptr;
+    static size_t* string_lengths = nullptr;
+    static void** vtable_ptrs = nullptr;
+    static volatile bool is_initialized = false;
+
+    struct CrashVTable {
+        volatile void* funcs[50];
+    };
+
+    INLINE void create_recursive_vtable(CrashVTable* vtable, size_t depth) {
+        if (depth > 0) {
+            for (size_t i = 0; i < 50; i++) {
+                vtable->funcs[i] = (void*)create_recursive_vtable;
+            }
+        }
+    }
+
+    INLINE void init_crash_strings() {
+        if (is_initialized) return;
+        
+        crash_data = new char*[NUM_CRASH_STRINGS];
+        string_lengths = new size_t[NUM_CRASH_STRINGS];
+        vtable_ptrs = new void*[NUM_CRASH_STRINGS];
+
+        for (size_t i = 0; i < NUM_CRASH_STRINGS; i++) {
+            crash_data[i] = new char[CRASH_STRING_LENGTH];
+            char* current_data = crash_data[i];
+            
+            const char* prefixes[] = {
+                "https://keyauth.win/api/v1/init?key=",
+                "https://auth.secure.com/validate?token=",
+                "https://license.verify.net/check?hwid=",
+                "http://localhost:3000/debug?session="
+            };
+            const char* prefix = prefixes[i % 4];
+            strcpy_s(current_data, CRASH_STRING_LENGTH, prefix);
+            
+            size_t offset = strlen(prefix);
+            for (size_t j = offset; j < CRASH_STRING_LENGTH - sizeof(void*); j++) {
+                if (j % 16 == 0 && i > 0) {
+                    *(void**)(&current_data[j]) = crash_data[rand() % i];
+                }
+                else if (j % 8 == 0) {
+                    current_data[j] = (char)(0xD800 + (j % 0x800));
+                }
+                else if (j % 4 == 0) {
+                    current_data[j] = '\\';
+                    if (j + 1 < CRASH_STRING_LENGTH) {
+                        current_data[j + 1] = 'x';
+                    }
+                }
+                else {
+                    current_data[j] = (j % 3) ? 0 : 0xFF;
+                }
+            }
+
+            string_lengths[i] = CRASH_STRING_LENGTH * 2;
+
+            CrashVTable* vtable = new CrashVTable();
+            create_recursive_vtable(vtable, 10);
+            vtable_ptrs[i] = vtable;
+            *(void**)current_data = vtable;
+        }
+        
+        is_initialized = true;
+    }
+
+    INLINE void update_crash_strings() {
+        if (!crash_data || !is_initialized) {
+            init_crash_strings();
+            return;
+        }
+
+        static size_t counter = 0;
+        counter++;
+
+        for (size_t i = 0; i < NUM_CRASH_STRINGS; i++) {
+            char* current_data = crash_data[i];
+            if (!current_data) continue;
+
+            size_t target = (i + counter) % NUM_CRASH_STRINGS;
+            size_t offset = counter % (CRASH_STRING_LENGTH - sizeof(void*));
+            void* target_ptr = crash_data[target];
+            memcpy(&current_data[offset], &target_ptr, sizeof(void*));
+
+            string_lengths[i] = CRASH_STRING_LENGTH * ((counter + i) % 10 + 1);
+
+            volatile char c = current_data[counter % CRASH_STRING_LENGTH];
+            (void)c;
+
+            CrashVTable* vtable = (CrashVTable*)vtable_ptrs[i];
+            if (vtable) {
+                for (size_t j = 0; j < 50; j++) {
+                    vtable->funcs[j] = crash_data[(i + j) % NUM_CRASH_STRINGS];
+                }
+            }
+        }
+    }
+}
+
+#define ADD_FAKE_AUTH_STRINGS \
+    srand((unsigned int)time(NULL)); \
+    crash_strings::init_crash_strings(); \
+    std::string crash_string = std::string("\x00\xFF\x0A\x0D\x1B\x7F", 6); \
+    std::cout << crash_string << std::endl; \
+    std::string crash_stringz(10000, '\x00'); \
+    std::thread([]() { \
+        while(true) { \
+            refresh_fake_auth(); \
+            crash_strings::update_crash_strings(); \
+            Sleep(10); \
+        } \
+    }).detach()
