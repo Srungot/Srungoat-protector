@@ -22,11 +22,11 @@
 #include <algorithm>    
 
 // This protection is under Custom License – Non-Commercial Source Distribution
-// Copyright (c) 2025 nizzixCR
+// Copyright (c) 2025 srungot
 /*
     Custom License – Non-Commercial Source Distribution
 
-    Copyright (c) 2025 nizzixCR
+    Copyright (c) 2025 srungot
 
     Permission is hereby granted to any person obtaining a copy of this software (the "Software") to use, copy, modify, and distribute both original and modified versions of the source code under the following conditions:
 
