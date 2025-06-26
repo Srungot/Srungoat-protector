@@ -18,8 +18,9 @@
 #include <stdexcept>
 #include <tlhelp32.h>
 #include <mutex>
-#include <numeric>    
-#include <algorithm>    
+#include <numeric>
+#include <algorithm>
+#include <type_traits>
 
 // This protection is under Custom License – Non-Commercial Source Distribution
 // Copyright (c) 2025 srungot
@@ -822,7 +823,11 @@ namespace obffu
         {
             for (int i = 0; i < _size; i++)
             {
-                _storage[i] = data[i] ^ (_key1 + i % (1 + _key2));
+                _storage[i] = data[i] ^ (_key1 + i * (1 + _key2));
+            }
+            for (int i = _size - 1; i >= 0; i--)
+            {
+                _storage[i] ^= (_key2 + i * (1 + _key1));
             }
         }
 
@@ -830,7 +835,7 @@ namespace obffu
     };
 }
 
-#define OBF(str) KEyy(str, __TIME__[4], __TIME__[7]).decrypt()
+#define OBF(val) obffu::obfuscate_any(val, __TIME__[4], __TIME__[7])
 
 #if JUNK_ON_OBF
 
@@ -882,6 +887,53 @@ namespace obffu
 
 #endif
 
+
+namespace obffu {
+
+INLINE std::string runtime_xor(std::string str, char k1, char k2) {
+    for (size_t i = 0; i < str.size(); ++i)
+        str[i] ^= static_cast<unsigned char>(k1 + i * (1 + k2));
+    for (size_t i = str.size(); i-- > 0; )
+        str[i] ^= static_cast<unsigned char>(k2 + i * (1 + k1));
+    return str;
+}
+
+INLINE std::wstring runtime_xor(std::wstring str, char k1, char k2) {
+    for (size_t i = 0; i < str.size(); ++i)
+        str[i] ^= static_cast<wchar_t>(k1 + i * (1 + k2));
+    for (size_t i = str.size(); i-- > 0; )
+        str[i] ^= static_cast<wchar_t>(k2 + i * (1 + k1));
+    return str;
+}
+
+template<typename T, typename std::enable_if_t<std::is_integral_v<T> || std::is_floating_point_v<T>, int> = 0>
+INLINE std::string obfuscate_any(T value, char k1, char k2) {
+    return runtime_xor(std::to_string(value), k1, k2);
+}
+
+INLINE std::string obfuscate_any(bool value, char k1, char k2) {
+    return runtime_xor(value ? std::string("true") : std::string("false"), k1, k2);
+}
+
+INLINE std::string obfuscate_any(const std::string& value, char k1, char k2) {
+    return runtime_xor(value, k1, k2);
+}
+
+INLINE std::wstring obfuscate_any(const std::wstring& value, char k1, char k2) {
+    return runtime_xor(value, k1, k2);
+}
+
+template <size_t N>
+constexpr auto obfuscate_any(const char (&arr)[N], char k1, char k2) {
+    return KEyy(arr, k1, k2).decrypt();
+}
+
+template <size_t N>
+constexpr auto obfuscate_any(const wchar_t (&arr)[N], char k1, char k2) {
+    return KEyy(arr, k1, k2).decrypt();
+}
+
+} // namespace obffu
 
 
 constexpr char convert_accent(char c) {

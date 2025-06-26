@@ -156,7 +156,7 @@ CALL_RANDOM_JUNK     // Random junk between calls
 
 ### Simple Encryption
 ```cpp
-OBF(str)              // Basic encryption
+OBF(str)              // Generic two-pass obfuscation for any type
 ```
 
 ### Advanced Encryption
@@ -265,7 +265,7 @@ int main() {
 
 ### Sensitive String Protection
 ```cpp
-// Simple encryption
+// Generic obfuscation
 const char* password = OBF("MyPassword");
 
 // Key-based encryption
