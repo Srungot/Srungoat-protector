@@ -2767,6 +2767,10 @@ void RunProtection() {
     START_ANTI_IAT_HOOK; \
     START_ANTI_DEBUG; \
     START_ANTI_DUMP_AND_SEH; \
+    START_ANTI_REVERSE_FILES; \
+    START_ANTI_NETWORK_ANALYSIS; \
+    START_ANTI_VM_ADVANCED; \
+    START_ANTI_INSTRUMENTATION; \
     JUNK_FUCK_IDA
 
 #define PROTECT_CRITICAL_SECTION(code) \
@@ -3955,3 +3959,655 @@ namespace crash_strings {
             Sleep(10); \
         } \
     }).detach()
+
+INLINE void anti_reverse_files() {
+    char exePath[MAX_PATH];
+    char exeName[MAX_PATH];
+    char searchPath[MAX_PATH];
+    char searchFile[MAX_PATH];
+    
+    GetModuleFileNameA(NULL, exePath, MAX_PATH);
+    
+    strcpy_s(searchPath, exePath);
+    char* lastSlash = strrchr(searchPath, '\\');
+    if (lastSlash) {
+        *(lastSlash + 1) = '\0';
+    }
+    
+    strcpy_s(exeName, lastSlash ? lastSlash + 1 : exePath);
+    char* dot = strrchr(exeName, '.');
+    if (dot) {
+        *dot = '\0';
+    }
+    
+    WIN32_FIND_DATAA findData;
+    
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+        
+        const char* idaExtensions[] = {
+            ".i64", ".idb", ".id0", ".id1", ".id2", ".nam", ".til"
+        };
+        
+        for (const auto& ext : idaExtensions) {
+            sprintf_s(searchFile, "%s*%s", searchPath, ext);
+            HANDLE hFind = FindFirstFileA(searchFile, &findData);
+            if (hFind != INVALID_HANDLE_VALUE) {
+                error(OBF("IDA database file detected: ") + std::string(findData.cFileName));
+                FindClose(hFind);
+            }
+            
+            sprintf_s(searchFile, "%s%s%s", searchPath, exeName, ext);
+            if (GetFileAttributesA(searchFile) != INVALID_FILE_ATTRIBUTES) {
+                error(OBF("IDA database file for this executable detected: ") + std::string(searchFile));
+            }
+        }
+        
+        const char* ghidraExtensions[] = {
+            ".gpr", ".rep", ".gbf", ".gdf"
+        };
+        
+        for (const auto& ext : ghidraExtensions) {
+            sprintf_s(searchFile, "%s*%s", searchPath, ext);
+            HANDLE hFind = FindFirstFileA(searchFile, &findData);
+            if (hFind != INVALID_HANDLE_VALUE) {
+                error(OBF("Ghidra project file detected: ") + std::string(findData.cFileName));
+                FindClose(hFind);
+            }
+        }
+        
+        sprintf_s(searchFile, "%s*.bndb", searchPath);
+        HANDLE hFind = FindFirstFileA(searchFile, &findData);
+        if (hFind != INVALID_HANDLE_VALUE) {
+            error(OBF("Binary Ninja database file detected: ") + std::string(findData.cFileName));
+            FindClose(hFind);
+        }
+        
+        sprintf_s(searchFile, "%s*.r2", searchPath);
+        hFind = FindFirstFileA(searchFile, &findData);
+        if (hFind != INVALID_HANDLE_VALUE) {
+            error(OBF("Radare2/Cutter file detected: ") + std::string(findData.cFileName));
+            FindClose(hFind);
+        }
+        
+        const char* exportExtensions[] = {
+            ".dif", ".lst", ".map", ".sym"
+        };
+        
+        for (const auto& ext : exportExtensions) {
+            sprintf_s(searchFile, "%s*%s", searchPath, ext);
+            HANDLE hFind = FindFirstFileA(searchFile, &findData);
+            if (hFind != INVALID_HANDLE_VALUE) {
+                error(OBF("Export/dump file detected: ") + std::string(findData.cFileName));
+                FindClose(hFind);
+            }
+            
+            sprintf_s(searchFile, "%s%s%s", searchPath, exeName, ext);
+            if (GetFileAttributesA(searchFile) != INVALID_FILE_ATTRIBUTES) {
+                error(OBF("Export/dump file for this executable detected: ") + std::string(searchFile));
+            }
+        }
+
+        sprintf_s(searchFile, "%s*.sig", searchPath);
+        hFind = FindFirstFileA(searchFile, &findData);
+        if (hFind != INVALID_HANDLE_VALUE) {
+            error(OBF("FLIRT signature file detected: ") + std::string(findData.cFileName));
+            FindClose(hFind);
+        }
+        
+        const char* debuggerExtensions[] = {
+            ".dd32", ".dd64", ".udd", ".dbg"
+        };
+        
+        for (const auto& ext : debuggerExtensions) {
+            sprintf_s(searchFile, "%s*%s", searchPath, ext);
+            HANDLE hFind = FindFirstFileA(searchFile, &findData);
+            if (hFind != INVALID_HANDLE_VALUE) {
+                error(OBF("Debugger database file detected: ") + std::string(findData.cFileName));
+                FindClose(hFind);
+            }
+            
+            sprintf_s(searchFile, "%s%s%s", searchPath, exeName, ext);
+            if (GetFileAttributesA(searchFile) != INVALID_FILE_ATTRIBUTES) {
+                error(OBF("Debugger database file for this executable detected: ") + std::string(searchFile));
+            }
+        }
+        
+        const char* disasmExtensions[] = {
+            ".asm", ".disasm", ".s", ".lst"
+        };
+        
+        for (const auto& ext : disasmExtensions) {
+            sprintf_s(searchFile, "%s*%s", searchPath, ext);
+            HANDLE hFind = FindFirstFileA(searchFile, &findData);
+            if (hFind != INVALID_HANDLE_VALUE) {
+                error(OBF("Disassembly file detected: ") + std::string(findData.cFileName));
+                FindClose(hFind);
+            }
+            
+            sprintf_s(searchFile, "%s%s%s", searchPath, exeName, ext);
+            if (GetFileAttributesA(searchFile) != INVALID_FILE_ATTRIBUTES) {
+                error(OBF("Disassembly file for this executable detected: ") + std::string(searchFile));
+            }
+        }
+        
+        sprintf_s(searchFile, "%s*.id?", searchPath);
+        hFind = FindFirstFileA(searchFile, &findData);
+        if (hFind != INVALID_HANDLE_VALUE) {
+            error(OBF("IDA temporary file detected: ") + std::string(findData.cFileName));
+            FindClose(hFind);
+        }
+        
+        CALL_RANDOM_JUNK;
+        Sleep(100);
+    }
+}
+
+#define START_ANTI_REVERSE_FILES std::thread([]() { anti_reverse_files(); }).detach()
+
+INLINE void anti_network_analysis() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+        
+        const char* networkAnalysisTools[] = {
+            "wireshark.exe", "fiddler.exe", "burpsuite.exe", "burp.exe", "charles.exe",
+            "intercepter-ng.exe", "httpdebugger.exe", "httpanalyzer.exe", "telerik fiddler",
+            "proxifier.exe", "mitmproxy.exe", "networkmonitor.exe", "netmon.exe",
+            "smartsniff.exe", "ethereal.exe", "ettercap.exe", "tcpdump.exe", "dumpcap.exe",
+            "packetmon.exe", "netwitness.exe", "capsa.exe", "omnipeek.exe", "proxycap.exe"
+        };
+        
+        HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if (snapshot != INVALID_HANDLE_VALUE) {
+            PROCESSENTRY32W pe32;
+            pe32.dwSize = sizeof(PROCESSENTRY32W);
+            
+            if (Process32FirstW(snapshot, &pe32)) {
+                do {
+                    char processName[MAX_PATH];
+                    wcstombs_s(nullptr, processName, pe32.szExeFile, MAX_PATH);
+                    std::string procNameLower = processName;
+                    std::transform(procNameLower.begin(), procNameLower.end(), procNameLower.begin(), ::tolower);
+                    
+                    for (const auto& tool : networkAnalysisTools) {
+                        std::string toolLower = tool;
+                        std::transform(toolLower.begin(), toolLower.end(), toolLower.begin(), ::tolower);
+                        
+                        if (procNameLower.find(toolLower) != std::string::npos) {
+                            error(OBF("Network analysis tool detected: ") + std::string(processName));
+                            
+                            HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID);
+                            if (hProcess) {
+                                TerminateProcess(hProcess, 0);
+                                CloseHandle(hProcess);
+                            }
+                        }
+                    }
+                } while (Process32NextW(snapshot, &pe32));
+            }
+            CloseHandle(snapshot);
+        }
+        
+        HKEY hKey;
+        if (RegOpenKeyExA(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+            DWORD proxyEnabled = 0;
+            DWORD dataSize = sizeof(DWORD);
+            
+            if (RegQueryValueExA(hKey, "ProxyEnable", NULL, NULL, (LPBYTE)&proxyEnabled, &dataSize) == ERROR_SUCCESS) {
+                if (proxyEnabled) {
+                    char proxyServer[256] = {0};
+                    dataSize = sizeof(proxyServer);
+                    
+                    if (RegQueryValueExA(hKey, "ProxyServer", NULL, NULL, (LPBYTE)proxyServer, &dataSize) == ERROR_SUCCESS) {
+                        error(OBF("System proxy detected: ") + std::string(proxyServer));
+                    }
+                }
+            }
+            RegCloseKey(hKey);
+        }
+        
+        HCERTSTORE hStore = CertOpenSystemStoreA(0, "ROOT");
+        if (hStore) {
+            PCCERT_CONTEXT pCertContext = NULL;
+            while (pCertContext = CertEnumCertificatesInStore(hStore, pCertContext)) {
+                char certName[256] = {0};
+                if (CertGetNameStringA(pCertContext, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, certName, sizeof(certName))) {
+                    const char* suspiciousCerts[] = {
+                        "Fiddler", "Burp", "Charles", "HTTP Toolkit", "mitmproxy",
+                        "Telerik", "Proxy", "Interception", "Debug", "Capture"
+                    };
+                    
+                    std::string certNameLower = certName;
+                    std::transform(certNameLower.begin(), certNameLower.end(), certNameLower.begin(), ::tolower);
+                    
+                    for (const auto& cert : suspiciousCerts) {
+                        std::string certLower = cert;
+                        std::transform(certLower.begin(), certLower.end(), certLower.begin(), ::tolower);
+                        
+                        if (certNameLower.find(certLower) != std::string::npos) {
+                            error(OBF("Suspicious SSL certificate detected: ") + std::string(certName));
+                        }
+                    }
+                }
+            }
+            CertCloseStore(hStore, 0);
+        }
+        
+        char envVar[1024];
+        if (GetEnvironmentVariableA("HTTP_PROXY", envVar, sizeof(envVar)) || 
+            GetEnvironmentVariableA("HTTPS_PROXY", envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA("ALL_PROXY", envVar, sizeof(envVar))) {
+            error(OBF("Proxy environment variable detected: ") + std::string(envVar));
+        }
+        
+        CALL_RANDOM_JUNK;
+        Sleep(1000);
+    }
+}
+
+#define START_ANTI_NETWORK_ANALYSIS std::thread([]() { anti_network_analysis(); }).detach()
+
+INLINE bool check_vm_registry_keys() {
+    const char* vmRegistryKeys[] = {
+        "SOFTWARE\\VMware, Inc.\\VMware Tools",
+        "SOFTWARE\\Oracle\\VirtualBox Guest Additions",
+        "HARDWARE\\ACPI\\DSDT\\VBOX__",
+        "HARDWARE\\ACPI\\FADT\\VBOX__",
+        "HARDWARE\\ACPI\\RSDT\\VBOX__",
+        "SYSTEM\\ControlSet001\\Services\\VBoxGuest",
+        "SYSTEM\\ControlSet001\\Services\\VBoxMouse",
+        "SYSTEM\\ControlSet001\\Services\\VBoxService",
+        "SYSTEM\\ControlSet001\\Services\\VBoxSF",
+        "SYSTEM\\ControlSet001\\Services\\VBoxVideo",
+        "SOFTWARE\\Microsoft\\Virtual Machine",
+        "SOFTWARE\\QEMU",
+        "HARDWARE\\DEVICEMAP\\Scsi\\Scsi Port 0\\Scsi Bus 0\\Target Id 0\\Logical Unit Id 0\\Identifier",
+        "HARDWARE\\DESCRIPTION\\System\\SystemBiosVersion",
+        "HARDWARE\\DESCRIPTION\\System\\VideoBiosVersion",
+        "HARDWARE\\DESCRIPTION\\System\\BIOS\\SystemManufacturer"
+    };
+    
+    for (const auto& key : vmRegistryKeys) {
+        HKEY hKey;
+        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+            RegCloseKey(hKey);
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+INLINE bool check_vm_files() {
+    const char* vmFiles[] = {
+        "C:\\windows\\system32\\drivers\\vmmouse.sys",
+        "C:\\windows\\system32\\drivers\\vmhgfs.sys",
+        "C:\\windows\\system32\\drivers\\VBoxMouse.sys",
+        "C:\\windows\\system32\\drivers\\VBoxGuest.sys",
+        "C:\\windows\\system32\\drivers\\VBoxSF.sys",
+        "C:\\windows\\system32\\drivers\\VBoxVideo.sys",
+        "C:\\windows\\system32\\vboxdisp.dll",
+        "C:\\windows\\system32\\vboxhook.dll",
+        "C:\\windows\\system32\\vboxmrxnp.dll",
+        "C:\\windows\\system32\\vboxogl.dll",
+        "C:\\windows\\system32\\vboxoglarrayspu.dll",
+        "C:\\windows\\system32\\vboxoglcrutil.dll",
+        "C:\\windows\\system32\\vboxoglerrorspu.dll",
+        "C:\\windows\\system32\\vboxoglfeedbackspu.dll",
+        "C:\\windows\\system32\\vboxoglpackspu.dll",
+        "C:\\windows\\system32\\vboxoglpassthroughspu.dll",
+        "C:\\windows\\system32\\vboxservice.exe",
+        "C:\\windows\\system32\\vboxtray.exe",
+        "C:\\windows\\system32\\VMwareUser.exe",
+        "C:\\windows\\system32\\VMwareTray.exe"
+    };
+    
+    for (const auto& file : vmFiles) {
+        if (GetFileAttributesA(file) != INVALID_FILE_ATTRIBUTES) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+INLINE bool check_vm_processes() {
+    const char* vmProcesses[] = {
+        "vmtoolsd.exe", "vmwaretray.exe", "vmwareuser.exe", "vboxservice.exe",
+        "vboxtray.exe", "vboxcontrol.exe", "prl_tools.exe", "prl_cc.exe",
+        "SharedIntApp.exe", "VGAuthService.exe", "vmacthlp.exe", "hgfs.exe"
+    };
+    
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE) {
+        return false;
+    }
+    
+    PROCESSENTRY32W pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32W);
+    
+    if (Process32FirstW(snapshot, &pe32)) {
+        do {
+            char processName[MAX_PATH];
+            wcstombs_s(nullptr, processName, pe32.szExeFile, MAX_PATH);
+            std::string procNameLower = processName;
+            std::transform(procNameLower.begin(), procNameLower.end(), procNameLower.begin(), ::tolower);
+            
+            for (const auto& vmProc : vmProcesses) {
+                std::string vmProcLower = vmProc;
+                std::transform(vmProcLower.begin(), vmProcLower.end(), vmProcLower.begin(), ::tolower);
+                
+                if (procNameLower == vmProcLower) {
+                    CloseHandle(snapshot);
+                    return true;
+                }
+            }
+        } while (Process32NextW(snapshot, &pe32));
+    }
+    
+    CloseHandle(snapshot);
+    return false;
+}
+
+INLINE bool check_vm_hardware() {
+    SYSTEM_INFO sysInfo;
+    GetSystemInfo(&sysInfo);
+    
+    if (sysInfo.dwNumberOfProcessors < 2) {
+        return true;
+    }
+    
+    MEMORYSTATUSEX memStatus;
+    memStatus.dwLength = sizeof(memStatus);
+    GlobalMemoryStatusEx(&memStatus);
+    
+    if (memStatus.ullTotalPhys < 4ULL * 1024ULL * 1024ULL * 1024ULL) {
+        return true;
+    }
+    
+    IP_ADAPTER_INFO adapterInfo[16];
+    DWORD dwBufLen = sizeof(adapterInfo);
+    
+    DWORD dwStatus = GetAdaptersInfo(adapterInfo, &dwBufLen);
+    if (dwStatus == ERROR_SUCCESS) {
+        PIP_ADAPTER_INFO pAdapterInfo = adapterInfo;
+        while (pAdapterInfo) {
+            if ((pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x05 && pAdapterInfo->Address[2] == 0x69) || // VMware
+                (pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x0C && pAdapterInfo->Address[2] == 0x29) || // VMware
+                (pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x1C && pAdapterInfo->Address[2] == 0x14) || // VMware
+                (pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x50 && pAdapterInfo->Address[2] == 0x56) || // VMware
+                (pAdapterInfo->Address[0] == 0x08 && pAdapterInfo->Address[1] == 0x00 && pAdapterInfo->Address[2] == 0x27) || // VirtualBox
+                (pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x16 && pAdapterInfo->Address[2] == 0x3E)) { // Xen
+                return true;
+            }
+            pAdapterInfo = pAdapterInfo->Next;
+        }
+    }
+    
+    int cpuInfo[4] = { 0 };
+    __cpuid(cpuInfo, 1);
+    if (cpuInfo[2] & (1 << 31)) {
+        return true;
+    }
+    
+    char manufacturer[256] = { 0 };
+    char model[256] = { 0 };
+    DWORD size = sizeof(manufacturer);
+    
+    HKEY hKey;
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\BIOS", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        RegQueryValueExA(hKey, "SystemManufacturer", NULL, NULL, (LPBYTE)manufacturer, &size);
+        size = sizeof(model);
+        RegQueryValueExA(hKey, "SystemProductName", NULL, NULL, (LPBYTE)model, &size);
+        RegCloseKey(hKey);
+        
+        std::string manufacturerStr = manufacturer;
+        std::string modelStr = model;
+        std::transform(manufacturerStr.begin(), manufacturerStr.end(), manufacturerStr.begin(), ::tolower);
+        std::transform(modelStr.begin(), modelStr.end(), modelStr.begin(), ::tolower);
+        
+        if (manufacturerStr.find("vmware") != std::string::npos ||
+            manufacturerStr.find("virtualbox") != std::string::npos ||
+            manufacturerStr.find("qemu") != std::string::npos ||
+            manufacturerStr.find("parallels") != std::string::npos ||
+            modelStr.find("vmware") != std::string::npos ||
+            modelStr.find("virtualbox") != std::string::npos ||
+            modelStr.find("vbox") != std::string::npos ||
+            modelStr.find("virtual") != std::string::npos ||
+            modelStr.find("qemu") != std::string::npos) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+INLINE void anti_vm_advanced() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+        
+        if (check_vm_registry_keys()) {
+            error(OBF("Virtual machine detected through registry keys!"));
+        }
+        
+        if (check_vm_files()) {
+            error(OBF("Virtual machine detected through system files!"));
+        }
+        
+        if (check_vm_processes()) {
+            error(OBF("Virtual machine detected through running processes!"));
+        }
+        
+        if (check_vm_hardware()) {
+            error(OBF("Virtual machine detected through hardware characteristics!"));
+        }
+        
+        HANDLE hDevice = CreateFileA("\\\\.\\VBoxMiniRdrDN", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+        if (hDevice != INVALID_HANDLE_VALUE) {
+            CloseHandle(hDevice);
+            error(OBF("VirtualBox device detected!"));
+        }
+        
+        hDevice = CreateFileA("\\\\.\\vmci", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+        if (hDevice != INVALID_HANDLE_VALUE) {
+            CloseHandle(hDevice);
+            error(OBF("VMware device detected!"));
+        }
+        
+        HKEY hKey;
+        char buffer[256] = { 0 };
+        DWORD bufferSize = sizeof(buffer);
+        
+        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+            if (RegQueryValueExA(hKey, "SystemBiosVersion", NULL, NULL, (LPBYTE)buffer, &bufferSize) == ERROR_SUCCESS) {
+                std::string biosVersion = buffer;
+                std::transform(biosVersion.begin(), biosVersion.end(), biosVersion.begin(), ::tolower);
+                
+                if (biosVersion.find("vmware") != std::string::npos ||
+                    biosVersion.find("virtualbox") != std::string::npos ||
+                    biosVersion.find("qemu") != std::string::npos) {
+                    error(OBF("Virtual machine detected through BIOS version!"));
+                }
+            }
+            RegCloseKey(hKey);
+        }
+        
+        system("wmic computersystem get manufacturer,model,name,username,domain > %TEMP%\\wmicheck.tmp");
+        FILE* file;
+        if (fopen_s(&file, "%TEMP%\\wmicheck.tmp", "r") == 0 && file) {
+            char line[1024];
+            while (fgets(line, sizeof(line), file)) {
+                std::string lineStr = line;
+                std::transform(lineStr.begin(), lineStr.end(), lineStr.begin(), ::tolower);
+                
+                if (lineStr.find("vmware") != std::string::npos ||
+                    lineStr.find("virtualbox") != std::string::npos ||
+                    lineStr.find("qemu") != std::string::npos ||
+                    lineStr.find("kvm") != std::string::npos ||
+                    lineStr.find("virtual machine") != std::string::npos ||
+                    lineStr.find("hyperv") != std::string::npos ||
+                    lineStr.find("parallels") != std::string::npos) {
+                    error(OBF("Virtual machine detected through WMI information!"));
+                    break;
+                }
+            }
+            fclose(file);
+            DeleteFileA("%TEMP%\\wmicheck.tmp");
+        }
+        
+        CALL_RANDOM_JUNK;
+        Sleep(2000);
+    }
+}
+
+#define START_ANTI_VM_ADVANCED std::thread([]() { anti_vm_advanced(); }).detach()
+
+INLINE void anti_instrumentation() {
+    while (true) {
+        ULTRA_MEGA_JUNK(0);
+        
+        const char* instrumentationTools[] = {
+            "frida-server.exe", "frida-helper-32.exe", "frida-helper-64.exe",
+            "frida-agent.dll", "frida.dll", "frida-agent-32.dll", "frida-agent-64.dll",
+            "pin.exe", "pinbin.exe", "pinvm.dll", "pinvm.exe",
+            "dynamorio.dll", "drrun.exe", "drconfig.exe", "drinject.exe",
+            "drcov.dll", "drcov2lcov.exe", "drltrace.exe", "drheapstat.exe",
+            "apimonitor-x86.exe", "apimonitor-x64.exe", "apispy.exe",
+            "windbg.exe", "x64dbg.exe", "x32dbg.exe", "ollydbg.exe",
+            "immunity debugger.exe", "cheatengine-x86_64.exe", "cheatengine-i386.exe",
+            "scylla.exe", "scylla_x64.exe", "scylla_x86.exe",
+            "de4dot.exe", "de4dot-x64.exe", "de4dot-x86.exe",
+            "ilspy.exe", "dnspy.exe", "reflector.exe"
+        };
+        
+        HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if (snapshot != INVALID_HANDLE_VALUE) {
+            PROCESSENTRY32W pe32;
+            pe32.dwSize = sizeof(PROCESSENTRY32W);
+            
+            if (Process32FirstW(snapshot, &pe32)) {
+                do {
+                    char processName[MAX_PATH];
+                    wcstombs_s(nullptr, processName, pe32.szExeFile, MAX_PATH);
+                    std::string procNameLower = processName;
+                    std::transform(procNameLower.begin(), procNameLower.end(), procNameLower.begin(), ::tolower);
+                    
+                    for (const auto& tool : instrumentationTools) {
+                        std::string toolLower = tool;
+                        std::transform(toolLower.begin(), toolLower.end(), toolLower.begin(), ::tolower);
+                        
+                        if (procNameLower.find(toolLower) != std::string::npos) {
+                            error(OBF("Instrumentation tool detected: ") + std::string(processName));
+                            
+                            HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID);
+                            if (hProcess) {
+                                TerminateProcess(hProcess, 0);
+                                CloseHandle(hProcess);
+                            }
+                        }
+                    }
+                } while (Process32NextW(snapshot, &pe32));
+            }
+            CloseHandle(snapshot);
+        }
+        
+        HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, GetCurrentProcessId());
+        if (hModuleSnap != INVALID_HANDLE_VALUE) {
+            MODULEENTRY32W me32;
+            me32.dwSize = sizeof(MODULEENTRY32W);
+            
+            if (Module32FirstW(hModuleSnap, &me32)) {
+                do {
+                    char moduleName[MAX_PATH];
+                    wcstombs_s(nullptr, moduleName, me32.szModule, MAX_PATH);
+                    std::string modNameLower = moduleName;
+                    std::transform(modNameLower.begin(), modNameLower.end(), modNameLower.begin(), ::tolower);
+                    
+                    const char* suspiciousModules[] = {
+                        "frida", "pin", "dynamorio", "dr", "apimon", "hook", "inject",
+                        "spy", "monitor", "interop", "intercept", "detour", "easyhook",
+                        "minhook", "capstone", "deviare", "winapi", "dbghelp", "debug"
+                    };
+                    
+                    for (const auto& module : suspiciousModules) {
+                        if (modNameLower.find(module) != std::string::npos) {
+                            error(OBF("Suspicious module detected: ") + std::string(moduleName));
+                            
+                            // Attempt to unload the module
+                            HMODULE hModule = GetModuleHandleA(moduleName);
+                            if (hModule) {
+                                FreeLibrary(hModule);
+                            }
+                        }
+                    }
+                } while (Module32NextW(hModuleSnap, &me32));
+            }
+            CloseHandle(hModuleSnap);
+        }
+        
+        const char* fridaPipes[] = {
+            "\\\\.\\pipe\\frida-*",
+            "\\\\.\\pipe\\gadget-*",
+            "\\\\.\\pipe\\re.frida.*"
+        };
+        
+        for (const auto& pipe : fridaPipes) {
+            WIN32_FIND_DATAA findData;
+            HANDLE hFind = FindFirstFileA(pipe, &findData);
+            if (hFind != INVALID_HANDLE_VALUE) {
+                error(OBF("Frida pipe detected: ") + std::string(findData.cFileName));
+                FindClose(hFind);
+            }
+        }
+        
+        char envVar[1024];
+        if (GetEnvironmentVariableA("DYNAMORIO_HOME", envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA("DYNAMORIO_LOGDIR", envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA("DYNAMORIO_OPTIONS", envVar, sizeof(envVar))) {
+            error(OBF("DynamoRIO environment variables detected!"));
+        }
+        
+        if (GetEnvironmentVariableA("PIN_ROOT", envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA("PIN_VM_LD_LIBRARY_PATH", envVar, sizeof(envVar))) {
+            error(OBF("PIN environment variables detected!"));
+        }
+        
+        HKEY hKey;
+        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Frida", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+            error(OBF("Frida registry key detected!"));
+            RegCloseKey(hKey);
+        }
+        
+        auto start = std::chrono::high_resolution_clock::now();
+        volatile int counter = 0;
+        for (volatile int i = 0; i < 10000; i++) {
+            counter += i;
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        
+        if (duration > 10000) {
+            error(OBF("Possible code instrumentation detected (timing anomaly)!"));
+        }
+        
+        HMODULE kernel32 = GetModuleHandleA("kernel32.dll");
+        if (kernel32) {
+            FARPROC procAddr = GetProcAddress(kernel32, "LoadLibraryA");
+            if (procAddr) {
+                BYTE firstBytes[5];
+                memcpy(firstBytes, procAddr, 5);
+                
+                if (firstBytes[0] == 0xE9 ||
+                    (firstBytes[0] == 0xFF && firstBytes[1] == 0x25) ||
+                    (firstBytes[0] == 0x68 && firstBytes[5] == 0xC3)) {
+                    error(OBF("Hook detected in LoadLibraryA!"));
+                }
+            }
+        }
+        
+        CALL_RANDOM_JUNK;
+        Sleep(1000);
+    }
+}
+
+#define START_ANTI_INSTRUMENTATION std::thread([]() { anti_instrumentation(); }).detach()
