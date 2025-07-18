@@ -50,7 +50,7 @@
 #define JUNK_ON_OBF_LEVEL 1     
 #define Name_Of_Sections_watermark ".1337"
 #define FAKE_SIGNATURES 1
-#define CALL_LEVEL 3  
+#define CALL_LEVEL 3
 
 #ifdef _MSC_VER
     #define SECTION(x) __declspec(allocate(x))
@@ -591,6 +591,7 @@ inline uint32_t rotl32(uint32_t x, unsigned int n) {
     Junkyyyyyyy(0); \
 } while(0)
 
+
 #define ZIGZAG_JUNK do { \
     if (rand() % 2) { \
         Junkyyyyyyy(0); \
@@ -602,6 +603,18 @@ inline uint32_t rotl32(uint32_t x, unsigned int n) {
         Junkyyyyyyy(0); \
     } \
 } while(0)
+
+#define ENTRYPOINT do { \
+    BUG_IDA; \
+    ZIGZAG_JUNK; \
+    BUG_IDA; \
+} while (0)
+
+#define ENDPOINT do { \
+    BUG_IDA; \
+    ENTRYPOINT;\
+    BUG_IDA;\
+} while (0)
 
 #define COOL_JUNK do { \
     if (rand() % 2) { \
@@ -1262,7 +1275,7 @@ void INTEGRITY_CHECK_FUNC_NAME()
 #define CALL(expr) \
     [&]() { \
         JUNK; \
-        auto&& _result = expr; \
+        void&& _result = expr; \
         JUNK; \
         return _result; \
     }()
@@ -4110,11 +4123,11 @@ INLINE void anti_network_analysis() {
         ULTRA_MEGA_JUNK(0);
         
         const char* networkAnalysisTools[] = {
-            "wireshark.exe", "fiddler.exe", "burpsuite.exe", "burp.exe", "charles.exe",
-            "intercepter-ng.exe", "httpdebugger.exe", "httpanalyzer.exe", "telerik fiddler",
-            "proxifier.exe", "mitmproxy.exe", "networkmonitor.exe", "netmon.exe",
-            "smartsniff.exe", "ethereal.exe", "ettercap.exe", "tcpdump.exe", "dumpcap.exe",
-            "packetmon.exe", "netwitness.exe", "capsa.exe", "omnipeek.exe", "proxycap.exe"
+            OBF("wireshark.exe"), OBF("fiddler.exe"), OBF("burpsuite.exe"), OBF("burp.exe"), OBF("charles.exe"),
+            OBF("intercepter-ng.exe"), OBF("httpdebugger.exe"), OBF("httpanalyzer.exe"), OBF("telerik fiddler"),
+            OBF("proxifier.exe"), OBF("mitmproxy.exe"), OBF("networkmonitor.exe"), OBF("netmon.exe"),
+            OBF("smartsniff.exe"),OBF("ethereal.exe"), OBF("ettercap.exe"),OBF("tcpdump.exe"), OBF("dumpcap.exe"),
+            OBF("packetmon.exe"),OBF("netwitness.exe"),OBF("capsa.exe"), OBF("omnipeek.exe"),OBF("proxycap.exe")
         };
         
         HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -4149,16 +4162,16 @@ INLINE void anti_network_analysis() {
         }
         
         HKEY hKey;
-        if (RegOpenKeyExA(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        if (RegOpenKeyExA(HKEY_CURRENT_USER, OBF("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings"), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
             DWORD proxyEnabled = 0;
             DWORD dataSize = sizeof(DWORD);
             
-            if (RegQueryValueExA(hKey, "ProxyEnable", NULL, NULL, (LPBYTE)&proxyEnabled, &dataSize) == ERROR_SUCCESS) {
+            if (RegQueryValueExA(hKey, OBF("ProxyEnable"), NULL, NULL, (LPBYTE)&proxyEnabled, &dataSize) == ERROR_SUCCESS) {
                 if (proxyEnabled) {
                     char proxyServer[256] = {0};
                     dataSize = sizeof(proxyServer);
                     
-                    if (RegQueryValueExA(hKey, "ProxyServer", NULL, NULL, (LPBYTE)proxyServer, &dataSize) == ERROR_SUCCESS) {
+                    if (RegQueryValueExA(hKey, OBF("ProxyServer"), NULL, NULL, (LPBYTE)proxyServer, &dataSize) == ERROR_SUCCESS) {
                         error(OBF("System proxy detected: ") + std::string(proxyServer));
                     }
                 }
@@ -4173,8 +4186,8 @@ INLINE void anti_network_analysis() {
                 char certName[256] = {0};
                 if (CertGetNameStringA(pCertContext, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, NULL, certName, sizeof(certName))) {
                     const char* suspiciousCerts[] = {
-                        "Fiddler", "Burp", "Charles", "HTTP Toolkit", "mitmproxy",
-                        "Telerik", "Proxy", "Interception", "Debug", "Capture"
+                        OBF("Fiddler"),OBF("Burp"),OBF("Charles"), OBF("HTTP Toolkit"),OBF("mitmproxy"),
+                       OBF("Telerik"), OBF("Proxy"), OBF("Interception"), OBF("Debug"), OBF("Capture")
                     };
                     
                     std::string certNameLower = certName;
@@ -4194,9 +4207,9 @@ INLINE void anti_network_analysis() {
         }
         
         char envVar[1024];
-        if (GetEnvironmentVariableA("HTTP_PROXY", envVar, sizeof(envVar)) || 
-            GetEnvironmentVariableA("HTTPS_PROXY", envVar, sizeof(envVar)) ||
-            GetEnvironmentVariableA("ALL_PROXY", envVar, sizeof(envVar))) {
+        if (GetEnvironmentVariableA(OBF("HTTP_PROXY"), envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA(OBF("HTTPS_PROXY"), envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA(OBF("ALL_PROXY"), envVar, sizeof(envVar))) {
             error(OBF("Proxy environment variable detected: ") + std::string(envVar));
         }
         
@@ -4209,22 +4222,22 @@ INLINE void anti_network_analysis() {
 
 INLINE bool check_vm_registry_keys() {
     const char* vmRegistryKeys[] = {
-        "SOFTWARE\\VMware, Inc.\\VMware Tools",
-        "SOFTWARE\\Oracle\\VirtualBox Guest Additions",
-        "HARDWARE\\ACPI\\DSDT\\VBOX__",
-        "HARDWARE\\ACPI\\FADT\\VBOX__",
-        "HARDWARE\\ACPI\\RSDT\\VBOX__",
-        "SYSTEM\\ControlSet001\\Services\\VBoxGuest",
-        "SYSTEM\\ControlSet001\\Services\\VBoxMouse",
-        "SYSTEM\\ControlSet001\\Services\\VBoxService",
-        "SYSTEM\\ControlSet001\\Services\\VBoxSF",
-        "SYSTEM\\ControlSet001\\Services\\VBoxVideo",
-        "SOFTWARE\\Microsoft\\Virtual Machine",
-        "SOFTWARE\\QEMU",
-        "HARDWARE\\DEVICEMAP\\Scsi\\Scsi Port 0\\Scsi Bus 0\\Target Id 0\\Logical Unit Id 0\\Identifier",
-        "HARDWARE\\DESCRIPTION\\System\\SystemBiosVersion",
-        "HARDWARE\\DESCRIPTION\\System\\VideoBiosVersion",
-        "HARDWARE\\DESCRIPTION\\System\\BIOS\\SystemManufacturer"
+        OBF("SOFTWARE\\VMware, Inc.\\VMware Tools"),
+        OBF("SOFTWARE\\Oracle\\VirtualBox Guest Additions"),
+        OBF("HARDWARE\\ACPI\\DSDT\\VBOX__"),
+        OBF("HARDWARE\\ACPI\\FADT\\VBOX__"),
+        OBF("HARDWARE\\ACPI\\RSDT\\VBOX__"),
+        OBF("SYSTEM\\ControlSet001\\Services\\VBoxGuest"),
+        OBF("SYSTEM\\ControlSet001\\Services\\VBoxMouse"),
+        OBF("SYSTEM\\ControlSet001\\Services\\VBoxService"),
+        OBF("SYSTEM\\ControlSet001\\Services\\VBoxSF"),
+        OBF("SYSTEM\\ControlSet001\\Services\\VBoxVideo"),
+        OBF("SOFTWARE\\Microsoft\\Virtual Machine"),
+        OBF("SOFTWARE\\QEMU"),
+        OBF("HARDWARE\\DEVICEMAP\\Scsi\\Scsi Port 0\\Scsi Bus 0\\Target Id 0\\Logical Unit Id 0\\Identifier"),
+        OBF("HARDWARE\\DESCRIPTION\\System\\SystemBiosVersion"),
+        OBF("HARDWARE\\DESCRIPTION\\System\\VideoBiosVersion"),
+        OBF("HARDWARE\\DESCRIPTION\\System\\BIOS\\SystemManufacturer")
     };
     
     for (const auto& key : vmRegistryKeys) {
@@ -4240,26 +4253,26 @@ INLINE bool check_vm_registry_keys() {
 
 INLINE bool check_vm_files() {
     const char* vmFiles[] = {
-        "C:\\windows\\system32\\drivers\\vmmouse.sys",
-        "C:\\windows\\system32\\drivers\\vmhgfs.sys",
-        "C:\\windows\\system32\\drivers\\VBoxMouse.sys",
-        "C:\\windows\\system32\\drivers\\VBoxGuest.sys",
-        "C:\\windows\\system32\\drivers\\VBoxSF.sys",
-        "C:\\windows\\system32\\drivers\\VBoxVideo.sys",
-        "C:\\windows\\system32\\vboxdisp.dll",
-        "C:\\windows\\system32\\vboxhook.dll",
-        "C:\\windows\\system32\\vboxmrxnp.dll",
-        "C:\\windows\\system32\\vboxogl.dll",
-        "C:\\windows\\system32\\vboxoglarrayspu.dll",
-        "C:\\windows\\system32\\vboxoglcrutil.dll",
-        "C:\\windows\\system32\\vboxoglerrorspu.dll",
-        "C:\\windows\\system32\\vboxoglfeedbackspu.dll",
-        "C:\\windows\\system32\\vboxoglpackspu.dll",
-        "C:\\windows\\system32\\vboxoglpassthroughspu.dll",
-        "C:\\windows\\system32\\vboxservice.exe",
-        "C:\\windows\\system32\\vboxtray.exe",
-        "C:\\windows\\system32\\VMwareUser.exe",
-        "C:\\windows\\system32\\VMwareTray.exe"
+        OBF("C:\\windows\\system32\\drivers\\vmmouse.sys"),
+        OBF("C:\\windows\\system32\\drivers\\vmhgfs.sys"),
+        OBF("C:\\windows\\system32\\drivers\\VBoxMouse.sys"),
+        OBF("C:\\windows\\system32\\drivers\\VBoxGuest.sys"),
+        OBF("C:\\windows\\system32\\drivers\\VBoxSF.sys"),
+        OBF("C:\\windows\\system32\\drivers\\VBoxVideo.sys"),
+        OBF("C:\\windows\\system32\\vboxdisp.dll"),
+        OBF("C:\\windows\\system32\\vboxhook.dll"),
+        OBF("C:\\windows\\system32\\vboxmrxnp.dll"),
+        OBF("C:\\windows\\system32\\vboxogl.dll"),
+        OBF("C:\\windows\\system32\\vboxoglarrayspu.dll"),
+        OBF("C:\\windows\\system32\\vboxoglcrutil.dll"),
+        OBF("C:\\windows\\system32\\vboxoglerrorspu.dll"),
+        OBF("C:\\windows\\system32\\vboxoglfeedbackspu.dll"),
+        OBF("C:\\windows\\system32\\vboxoglpackspu.dll"),
+        OBF("C:\\windows\\system32\\vboxoglpassthroughspu.dll"),
+        OBF("C:\\windows\\system32\\vboxservice.exe"),
+        OBF("C:\\windows\\system32\\vboxtray.exe"),
+        OBF("C:\\windows\\system32\\VMwareUser.exe"),
+        OBF("C:\\windows\\system32\\VMwareTray.exe")
     };
     
     for (const auto& file : vmFiles) {
@@ -4273,9 +4286,9 @@ INLINE bool check_vm_files() {
 
 INLINE bool check_vm_processes() {
     const char* vmProcesses[] = {
-        "vmtoolsd.exe", "vmwaretray.exe", "vmwareuser.exe", "vboxservice.exe",
-        "vboxtray.exe", "vboxcontrol.exe", "prl_tools.exe", "prl_cc.exe",
-        "SharedIntApp.exe", "VGAuthService.exe", "vmacthlp.exe", "hgfs.exe"
+        OBF("vmtoolsd.exe"), OBF("vmwaretray.exe"),OBF("vmwareuser.exe"),OBF("vboxservice.exe"),
+        OBF("vboxtray.exe"), OBF("vboxcontrol.exe"),OBF("prl_tools.exe"), OBF("prl_cc.exe"),
+        OBF("SharedIntApp.exe"), OBF("VGAuthService.exe"), OBF("vmacthlp.exe"), OBF("hgfs.exe")
     };
     
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -4309,79 +4322,6 @@ INLINE bool check_vm_processes() {
     return false;
 }
 
-INLINE bool check_vm_hardware() {
-    SYSTEM_INFO sysInfo;
-    GetSystemInfo(&sysInfo);
-    
-    if (sysInfo.dwNumberOfProcessors < 2) {
-        return true;
-    }
-    
-    MEMORYSTATUSEX memStatus;
-    memStatus.dwLength = sizeof(memStatus);
-    GlobalMemoryStatusEx(&memStatus);
-    
-    if (memStatus.ullTotalPhys < 4ULL * 1024ULL * 1024ULL * 1024ULL) {
-        return true;
-    }
-    
-    IP_ADAPTER_INFO adapterInfo[16];
-    DWORD dwBufLen = sizeof(adapterInfo);
-    
-    DWORD dwStatus = GetAdaptersInfo(adapterInfo, &dwBufLen);
-    if (dwStatus == ERROR_SUCCESS) {
-        PIP_ADAPTER_INFO pAdapterInfo = adapterInfo;
-        while (pAdapterInfo) {
-            if ((pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x05 && pAdapterInfo->Address[2] == 0x69) || // VMware
-                (pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x0C && pAdapterInfo->Address[2] == 0x29) || // VMware
-                (pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x1C && pAdapterInfo->Address[2] == 0x14) || // VMware
-                (pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x50 && pAdapterInfo->Address[2] == 0x56) || // VMware
-                (pAdapterInfo->Address[0] == 0x08 && pAdapterInfo->Address[1] == 0x00 && pAdapterInfo->Address[2] == 0x27) || // VirtualBox
-                (pAdapterInfo->Address[0] == 0x00 && pAdapterInfo->Address[1] == 0x16 && pAdapterInfo->Address[2] == 0x3E)) { // Xen
-                return true;
-            }
-            pAdapterInfo = pAdapterInfo->Next;
-        }
-    }
-    
-    int cpuInfo[4] = { 0 };
-    __cpuid(cpuInfo, 1);
-    if (cpuInfo[2] & (1 << 31)) {
-        return true;
-    }
-    
-    char manufacturer[256] = { 0 };
-    char model[256] = { 0 };
-    DWORD size = sizeof(manufacturer);
-    
-    HKEY hKey;
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\BIOS", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-        RegQueryValueExA(hKey, "SystemManufacturer", NULL, NULL, (LPBYTE)manufacturer, &size);
-        size = sizeof(model);
-        RegQueryValueExA(hKey, "SystemProductName", NULL, NULL, (LPBYTE)model, &size);
-        RegCloseKey(hKey);
-        
-        std::string manufacturerStr = manufacturer;
-        std::string modelStr = model;
-        std::transform(manufacturerStr.begin(), manufacturerStr.end(), manufacturerStr.begin(), ::tolower);
-        std::transform(modelStr.begin(), modelStr.end(), modelStr.begin(), ::tolower);
-        
-        if (manufacturerStr.find("vmware") != std::string::npos ||
-            manufacturerStr.find("virtualbox") != std::string::npos ||
-            manufacturerStr.find("qemu") != std::string::npos ||
-            manufacturerStr.find("parallels") != std::string::npos ||
-            modelStr.find("vmware") != std::string::npos ||
-            modelStr.find("virtualbox") != std::string::npos ||
-            modelStr.find("vbox") != std::string::npos ||
-            modelStr.find("virtual") != std::string::npos ||
-            modelStr.find("qemu") != std::string::npos) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
 INLINE void anti_vm_advanced() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
@@ -4398,17 +4338,13 @@ INLINE void anti_vm_advanced() {
             error(OBF("Virtual machine detected through running processes!"));
         }
         
-        if (check_vm_hardware()) {
-            error(OBF("Virtual machine detected through hardware characteristics!"));
-        }
-        
-        HANDLE hDevice = CreateFileA("\\\\.\\VBoxMiniRdrDN", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+        HANDLE hDevice = CreateFileA(OBF("\\\\.\\VBoxMiniRdrDN"), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
         if (hDevice != INVALID_HANDLE_VALUE) {
             CloseHandle(hDevice);
             error(OBF("VirtualBox device detected!"));
         }
         
-        hDevice = CreateFileA("\\\\.\\vmci", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+        hDevice = CreateFileA(OBF("\\\\.\\vmci"), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
         if (hDevice != INVALID_HANDLE_VALUE) {
             CloseHandle(hDevice);
             error(OBF("VMware device detected!"));
@@ -4418,41 +4354,41 @@ INLINE void anti_vm_advanced() {
         char buffer[256] = { 0 };
         DWORD bufferSize = sizeof(buffer);
         
-        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-            if (RegQueryValueExA(hKey, "SystemBiosVersion", NULL, NULL, (LPBYTE)buffer, &bufferSize) == ERROR_SUCCESS) {
+        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, OBF("HARDWARE\\DESCRIPTION\\System"), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+            if (RegQueryValueExA(hKey, OBF("SystemBiosVersion"), NULL, NULL, (LPBYTE)buffer, &bufferSize) == ERROR_SUCCESS) {
                 std::string biosVersion = buffer;
                 std::transform(biosVersion.begin(), biosVersion.end(), biosVersion.begin(), ::tolower);
                 
-                if (biosVersion.find("vmware") != std::string::npos ||
-                    biosVersion.find("virtualbox") != std::string::npos ||
-                    biosVersion.find("qemu") != std::string::npos) {
+                if (biosVersion.find(OBF("vmware")) != std::string::npos ||
+                    biosVersion.find(OBF("virtualbox")) != std::string::npos ||
+                    biosVersion.find(OBF("qemu")) != std::string::npos) {
                     error(OBF("Virtual machine detected through BIOS version!"));
                 }
             }
             RegCloseKey(hKey);
         }
         
-        system("wmic computersystem get manufacturer,model,name,username,domain > %TEMP%\\wmicheck.tmp");
+        system(OBF("wmic computersystem get manufacturer,model,name,username,domain > %TEMP%\\wmicheck.tmp"));
         FILE* file;
-        if (fopen_s(&file, "%TEMP%\\wmicheck.tmp", "r") == 0 && file) {
+        if (fopen_s(&file, OBF("%TEMP%\\wmicheck.tmp"), "r") == 0 && file) {
             char line[1024];
             while (fgets(line, sizeof(line), file)) {
                 std::string lineStr = line;
                 std::transform(lineStr.begin(), lineStr.end(), lineStr.begin(), ::tolower);
                 
-                if (lineStr.find("vmware") != std::string::npos ||
-                    lineStr.find("virtualbox") != std::string::npos ||
-                    lineStr.find("qemu") != std::string::npos ||
-                    lineStr.find("kvm") != std::string::npos ||
-                    lineStr.find("virtual machine") != std::string::npos ||
-                    lineStr.find("hyperv") != std::string::npos ||
-                    lineStr.find("parallels") != std::string::npos) {
+                if (lineStr.find(OBF("vmware")) != std::string::npos ||
+                    lineStr.find(OBF("virtualbox")) != std::string::npos ||
+                    lineStr.find(OBF("qemu")) != std::string::npos ||
+                    lineStr.find(OBF("kvm")) != std::string::npos ||
+                    lineStr.find(OBF("virtual machine")) != std::string::npos ||
+                    lineStr.find(OBF("hyperv")) != std::string::npos ||
+                    lineStr.find(OBF("parallels")) != std::string::npos) {
                     error(OBF("Virtual machine detected through WMI information!"));
                     break;
                 }
             }
             fclose(file);
-            DeleteFileA("%TEMP%\\wmicheck.tmp");
+            DeleteFileA(OBF("%TEMP%\\wmicheck.tmp"));
         }
         
         CALL_RANDOM_JUNK;
@@ -4467,17 +4403,17 @@ INLINE void anti_instrumentation() {
         ULTRA_MEGA_JUNK(0);
         
         const char* instrumentationTools[] = {
-            "frida-server.exe", "frida-helper-32.exe", "frida-helper-64.exe",
-            "frida-agent.dll", "frida.dll", "frida-agent-32.dll", "frida-agent-64.dll",
-            "pin.exe", "pinbin.exe", "pinvm.dll", "pinvm.exe",
-            "dynamorio.dll", "drrun.exe", "drconfig.exe", "drinject.exe",
-            "drcov.dll", "drcov2lcov.exe", "drltrace.exe", "drheapstat.exe",
-            "apimonitor-x86.exe", "apimonitor-x64.exe", "apispy.exe",
-            "windbg.exe", "x64dbg.exe", "x32dbg.exe", "ollydbg.exe",
-            "immunity debugger.exe", "cheatengine-x86_64.exe", "cheatengine-i386.exe",
-            "scylla.exe", "scylla_x64.exe", "scylla_x86.exe",
-            "de4dot.exe", "de4dot-x64.exe", "de4dot-x86.exe",
-            "ilspy.exe", "dnspy.exe", "reflector.exe"
+            OBF("frida-server.exe"), OBF("frida-helper-32.exe"), OBF("frida-helper-64.exe"),
+            OBF("frida-agent.dll"), OBF("frida.dll"), OBF("frida-agent-32.dll"), OBF("frida-agent-64.dll"),
+            OBF("pin.exe"), OBF("pinbin.exe"), OBF("pinvm.dll"), OBF("pinvm.exe"),
+            OBF("dynamorio.dll"), OBF("drrun.exe"), OBF("drconfig.exe"), OBF("drinject.exe"),
+            OBF("drcov.dll"), OBF("drcov2lcov.exe"), OBF("drltrace.exe"), OBF("drheapstat.exe"),
+            OBF("apimonitor-x86.exe"), OBF("apimonitor-x64.exe"), OBF("apispy.exe"),
+            OBF("windbg.exe"), OBF("x64dbg.exe"), OBF("x32dbg.exe"), OBF("ollydbg.exe"),
+            OBF("immunity debugger.exe"), OBF("cheatengine-x86_64.exe"), OBF("cheatengine-i386.exe"),
+            OBF("scylla.exe"), OBF("scylla_x64.exe"), OBF("scylla_x86.exe"),
+            OBF("de4dot.exe"), OBF("de4dot-x64.exe"), OBF("de4dot-x86.exe"),
+            OBF("ilspy.exe"), OBF("dnspy.exe"), OBF("reflector.exe")
         };
         
         HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -4524,16 +4460,15 @@ INLINE void anti_instrumentation() {
                     std::transform(modNameLower.begin(), modNameLower.end(), modNameLower.begin(), ::tolower);
                     
                     const char* suspiciousModules[] = {
-                        "frida", "pin", "dynamorio", "dr", "apimon", "hook", "inject",
-                        "spy", "monitor", "interop", "intercept", "detour", "easyhook",
-                        "minhook", "capstone", "deviare", "winapi", "dbghelp", "debug"
+                        OBF("frida"), OBF("pin"), OBF("dynamorio"), OBF("dr"), OBF("apimon"), OBF("hook"), OBF("inject"),
+                        OBF("spy"), OBF("monitor"), OBF("interop"), OBF("intercept"), OBF("detour"), OBF("easyhook"),
+                        OBF("minhook"), OBF("capstone"), OBF("deviare"), OBF("winapi"), OBF("dbghelp"), OBF("debug")
                     };
                     
                     for (const auto& module : suspiciousModules) {
                         if (modNameLower.find(module) != std::string::npos) {
                             error(OBF("Suspicious module detected: ") + std::string(moduleName));
                             
-                            // Attempt to unload the module
                             HMODULE hModule = GetModuleHandleA(moduleName);
                             if (hModule) {
                                 FreeLibrary(hModule);
@@ -4546,9 +4481,9 @@ INLINE void anti_instrumentation() {
         }
         
         const char* fridaPipes[] = {
-            "\\\\.\\pipe\\frida-*",
-            "\\\\.\\pipe\\gadget-*",
-            "\\\\.\\pipe\\re.frida.*"
+            OBF("\\\\.\\pipe\\frida-*"),
+            OBF("\\\\.\\pipe\\gadget-*"),
+            OBF("\\\\.\\pipe\\re.frida.*")
         };
         
         for (const auto& pipe : fridaPipes) {
@@ -4561,19 +4496,19 @@ INLINE void anti_instrumentation() {
         }
         
         char envVar[1024];
-        if (GetEnvironmentVariableA("DYNAMORIO_HOME", envVar, sizeof(envVar)) ||
-            GetEnvironmentVariableA("DYNAMORIO_LOGDIR", envVar, sizeof(envVar)) ||
-            GetEnvironmentVariableA("DYNAMORIO_OPTIONS", envVar, sizeof(envVar))) {
+        if (GetEnvironmentVariableA(OBF("DYNAMORIO_HOME"), envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA(OBF("DYNAMORIO_LOGDIR"), envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA(OBF("DYNAMORIO_OPTIONS"), envVar, sizeof(envVar))) {
             error(OBF("DynamoRIO environment variables detected!"));
         }
         
-        if (GetEnvironmentVariableA("PIN_ROOT", envVar, sizeof(envVar)) ||
-            GetEnvironmentVariableA("PIN_VM_LD_LIBRARY_PATH", envVar, sizeof(envVar))) {
+        if (GetEnvironmentVariableA(OBF("PIN_ROOT"), envVar, sizeof(envVar)) ||
+            GetEnvironmentVariableA(OBF("PIN_VM_LD_LIBRARY_PATH"), envVar, sizeof(envVar))) {
             error(OBF("PIN environment variables detected!"));
         }
         
         HKEY hKey;
-        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Frida", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, OBF("SOFTWARE\\Frida"), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
             error(OBF("Frida registry key detected!"));
             RegCloseKey(hKey);
         }
@@ -4590,9 +4525,9 @@ INLINE void anti_instrumentation() {
             error(OBF("Possible code instrumentation detected (timing anomaly)!"));
         }
         
-        HMODULE kernel32 = GetModuleHandleA("kernel32.dll");
+        HMODULE kernel32 = GetModuleHandleA(OBF("kernel32.dll"));
         if (kernel32) {
-            FARPROC procAddr = GetProcAddress(kernel32, "LoadLibraryA");
+            FARPROC procAddr = GetProcAddress(kernel32, OBF("LoadLibraryA"));
             if (procAddr) {
                 BYTE firstBytes[5];
                 memcpy(firstBytes, procAddr, 5);
