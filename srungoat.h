@@ -1,3 +1,6 @@
+#ifndef SRUNGOAT_H
+#define SRUNGOAT_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -7,6 +10,8 @@
 #include <ctime>
 #include <windows.h>
 #include <lmcons.h>
+#include <winternl.h>
+#include <psapi.h>
 #include <chrono>
 #include <iomanip>
 #include <sstream>
@@ -21,8 +26,25 @@
 #include <numeric>    
 #include <algorithm>    
 
+#ifdef _KERNEL_MODE
+    #include <ntddk.h>
+    #include <ntdef.h>
+#else
+    #include <Windows.h>
+#endif
+#include <Intrin.h>
+
+#pragma once
+
 // This protection is under Custom License – Non-Commercial Source Distribution
 // Copyright (c) 2025 srungot
+// Discord: https://discord.gg/denuvo
+// Discord Username: 0x61d
+
+// Credits:
+// - https://github.com/ac3ss0r/obfusheader.h/tree/main - Thank you ac3ss0r for the base of fake signatures
+// - https://github.com/Barracudach/CallStack-Spoofer/tree/main - Thank you for the spoof function
+
 /*
     Custom License – Non-Commercial Source Distribution
 
@@ -44,6 +66,18 @@
     By using this Software, you agree to these terms.
 
     This is a custom license and is not OSI-approved.
+*/
+
+// ================================
+
+/*
+    Changelog:
+    - 2025-07-31:
+        - Added changelog
+        - Compatible multi include
+        - Modified string obfuscation function
+        - Better encryption key for the macro OBF
+        - Update of anti windows title error due to false positives on windows 11 ( windows terminal )
 */
 
 #define JUNK_ON_OBF 1  
@@ -77,7 +111,7 @@ struct REMOTE_PE_HEADER : PE_HEADER {
     ULONG_PTR remoteBaseAddress;
 };
 
-#if FAKE_SIGNATURES         // taked here https://github.com/ac3ss0r/obfusheader.h/tree/main thank you ac3ss0r
+#if FAKE_SIGNATURES
     #ifdef _MSC_VER
         #pragma section(".arch", read)
         #pragma section(".srdata", read)
@@ -330,11 +364,12 @@ struct REMOTE_PE_HEADER : PE_HEADER {
 #define INTEGRITY_CHECK_FUNC_NAME ________________________________
 #define START_INTEGRITY_CHECK std::thread([]() { INTEGRITY_CHECK_FUNC_NAME(); }).detach()
 
-DWORD64 Function_Addressz;
-volatile int chaos_seed = 10003;
+static DWORD64 Function_Addressz = 0;
+static volatile int chaos_seed = 10003;
 
 #include <winternl.h>
 #pragma comment(lib, "ntdll.lib")
+#pragma comment(lib, "crypt32.lib")
 
 typedef NTSTATUS(NTAPI* pNtSetInformationProcess)(
     HANDLE ProcessHandle,
@@ -364,7 +399,7 @@ namespace srungoat_signature {
     }
 }
 
-inline uint32_t rotl32(uint32_t x, unsigned int n) {
+static inline uint32_t rotl32(uint32_t x, unsigned int n) {
     return (x << n) | (x >> (32 - n));
 }
 
@@ -675,7 +710,7 @@ inline uint32_t rotl32(uint32_t x, unsigned int n) {
 
 
 
-inline char rotl8(char value, unsigned int count) {
+static inline char rotl8(char value, unsigned int count) {
     return (value << count) | (value >> (8 - count));
 }
 
@@ -784,7 +819,7 @@ namespace obffu
             return _storage;
         }
 
-        __forceinline int size()   
+        __forceinline int size()
         {
             return _size;
         }
@@ -815,7 +850,7 @@ namespace obffu
             return _storage[_size - 1] != 0;
         }
 
-        __forceinline void clear()      
+        __forceinline void clear()
         {
             for (int i = 0; i < _size; i++)
             {
@@ -851,7 +886,7 @@ namespace obffu
 #define KEyy(str, key1, key2) []() { \
             JUNK_VAR; \
             CALL_RANDOM_JUNK; \
-            constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), key1, key2, \
+            constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), (key1 ^ 0x5A) + (__LINE__ % 127), (key2 << 1) ^ 0x3F + (__COUNTER__ % 89), \
                 obffu::clean_type<decltype(str[0])>>((obffu::clean_type<decltype(str[0])>*)str); \
             CALL_RANDOM_JUNK; \
             JUNK_VAR; \
@@ -860,7 +895,7 @@ namespace obffu
 #elif JUNK_ON_OBF_LEVEL == 2
 #define KEyy(str, key1, key2) []() { \
             COOL_JUNK; \
-            constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), key1, key2, \
+            constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), (key1 + 0xAB) ^ (__LINE__ % 255), (key2 * 3) + (__COUNTER__ % 191), \
                 obffu::clean_type<decltype(str[0])>>((obffu::clean_type<decltype(str[0])>*)str); \
             COOL_JUNK; \
             return crypted; \
@@ -868,7 +903,7 @@ namespace obffu
 #elif JUNK_ON_OBF_LEVEL == 1
 #define KEyy(str, key1, key2) []() { \
             JUNK; \
-            constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), key1, key2, \
+            constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), (key1 | 0x42) + (__LINE__ % 63), (key2 ^ 0x1E) * (__COUNTER__ % 37), \
                 obffu::clean_type<decltype(str[0])>>((obffu::clean_type<decltype(str[0])>*)str); \
             JUNK; \
             return crypted; \
@@ -876,7 +911,7 @@ namespace obffu
 #elif JUNK_ON_OBF_LEVEL == 0
 #define KEyy(str, key1, key2) []() { \
             Junkyyyyyyy(0); \
-            constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), key1, key2, \
+            constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), (key1 & 0x7F) ^ (__LINE__ % 31), (key2 + 0x55) | (__COUNTER__ % 127), \
                 obffu::clean_type<decltype(str[0])>>((obffu::clean_type<decltype(str[0])>*)str); \
             Junkyyyyyyy(0); \
             return crypted; \
@@ -888,7 +923,7 @@ namespace obffu
 #else
 
 #define KEyy(str, key1, key2) []() { \
-        constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), key1, key2, \
+        constexpr static auto crypted = obffu::skCrypter<sizeof(str) / sizeof(str[0]), (key1 ^ 0x2D) + (__LINE__ % 73), (key2 << 2) ^ (__COUNTER__ % 97), \
             obffu::clean_type<decltype(str[0])>>((obffu::clean_type<decltype(str[0])>*)str); \
         return crypted; \
     }()
@@ -943,7 +978,7 @@ constexpr char convert_accent(char c) {
     (void)WATERMARK_UNIQUE_NAME(__ptr2)
 
 
-bool bDataCompare(const BYTE* pData, const BYTE* bMask, const char* szMask)
+static inline bool bDataCompare(const BYTE* pData, const BYTE* bMask, const char* szMask)
 {
     for (; *szMask; ++szMask, ++pData, ++bMask)
         if (*szMask == 'x' && *pData != *bMask)
@@ -951,7 +986,7 @@ bool bDataCompare(const BYTE* pData, const BYTE* bMask, const char* szMask)
     return (*szMask) == 0;
 }
 
-DWORD64 FindPatternz(BYTE* bMask, const char* szMask)
+static inline DWORD64 FindPatternz(BYTE* bMask, const char* szMask)
 {
     MODULEINFO mi{ };
     GetModuleInformation(GetCurrentProcess(), GetModuleHandleA(NULL), &mi, sizeof(mi));
@@ -967,7 +1002,7 @@ DWORD64 FindPatternz(BYTE* bMask, const char* szMask)
     return NULL;
 }
 
-void error(const std::string& message) {
+static inline void error(const std::string& message) {
     std::string cmd = OBF("start cmd /C \"color D && title ") + std::string(".") + OBF("Security Alert") +
         OBF(" && echo ") + std::string(PINK) + message +
         std::string(RESET) + OBF(" && timeout /t 5\"");
@@ -975,16 +1010,16 @@ void error(const std::string& message) {
     exit(1);
 }
 
-void error(const char* message) {
+static inline void error(const char* message) {
     error(std::string(message));
 }
 
 template<size_t _size, char _key1, char _key2, typename T>
-void error(std::string& message) {
-    error(std::string(message));
+static inline void error(std::string& message) {
+    error(static_cast<const std::string&>(message));
 }
 
-auto check_section_integrityz(const char* section_name, bool fix = false) -> bool
+static inline auto check_section_integrityz(const char* section_name, bool fix = false) -> bool
 {
     const auto hmodule = GetModuleHandle(0);
     if (!hmodule) {
@@ -1104,7 +1139,7 @@ auto check_section_integrityz(const char* section_name, bool fix = false) -> boo
     return patched;
 }
 
-std::string checksumz()
+static inline std::string checksumz()
 {
     auto exec = [&](const char* cmd) -> std::string
         {
@@ -1135,7 +1170,7 @@ std::string checksumz()
 #include <aclapi.h>
 #include <bcrypt.h>
 
-inline bool LockMemAccessz()
+static inline bool LockMemAccessz()
 {
     bool bSuccess = false;
     HANDLE hToken = nullptr;
@@ -1226,7 +1261,7 @@ Cleanup:
     return bSuccess;
 }
 
-bool checkAcceleratorIntegrityz() {
+static inline bool checkAcceleratorIntegrityz() {
     HMODULE hModule = GetModuleHandle(NULL);
     HRSRC hRsrc = FindResource(hModule, MAKEINTRESOURCE(1), RT_ACCELERATOR);
 
@@ -1237,9 +1272,9 @@ bool checkAcceleratorIntegrityz() {
     return true;
 }
 
-void INTEGRITY_CHECK_FUNC_NAME()
+static inline void INTEGRITY_CHECK_FUNC_NAME()
 {
-    check_section_integrityz(".text", true);
+    check_section_integrityz(OBF(".text"), true);
 
     while (true)
     {
@@ -1247,7 +1282,7 @@ void INTEGRITY_CHECK_FUNC_NAME()
             error(OBF("Critical security violation: Resource tampering detected"));
         }
 
-        if (check_section_integrityz(".text"), false)
+        if (check_section_integrityz(OBF(".text"), false))
         {
             error(OBF("Critical security violation: Memory tampering detected"));
         }
@@ -1259,7 +1294,7 @@ void INTEGRITY_CHECK_FUNC_NAME()
 
         if (Function_Addressz == NULL) {
             BYTE pattern[] = "\x48\x89\x74\x24\x00\x57\x48\x81\xec\x00\x00\x00\x00\x49\x8b\xf0";
-            Function_Addressz = FindPatternz(pattern, "xxxx?xxxx????xxx") - 0x5;
+            Function_Addressz = FindPatternz(pattern, OBF("xxxx?xxxx????xxx")) - 0x5;
         }
 
         BYTE Instruction = *(BYTE*)Function_Addressz;
@@ -1411,24 +1446,24 @@ struct FUNC {
     SIZE_T size;
 };
 
-FUNC funcList[] = {
-    { OBF("DbgBreakPoint"), 0, DbgBreakPoint_FUNC_SIZE },
-    { OBF("DbgUiRemoteBreakin"), 0, DbgUiRemoteBreakin_FUNC_SIZE },
-    { OBF("NtContinue"), 0, NtContinue_FUNC_SIZE }
+static FUNC funcList[] = {
+    { "DbgBreakPoint", 0, DbgBreakPoint_FUNC_SIZE },
+    { "DbgUiRemoteBreakin", 0, DbgUiRemoteBreakin_FUNC_SIZE },
+    { "NtContinue", 0, NtContinue_FUNC_SIZE }
 };
 
-INLINE void anti_attach() {
+static INLINE void anti_attach() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
 
         if (IsDebuggerPresent()) {
-            error(OBF("Debugger detected!"));
+            error("Debugger detected!");
         }
 
         BOOL isRemoteDebuggerPresent = FALSE;
         CheckRemoteDebuggerPresent(GetCurrentProcess(), &isRemoteDebuggerPresent);
         if (isRemoteDebuggerPresent) {
-            error(OBF("Remote debugger detected!"));
+            error("Remote debugger detected!");
         }
 
         HANDLE hProcess = GetCurrentProcess();
@@ -1449,7 +1484,7 @@ INLINE void anti_attach() {
             );
 
             if (NT_SUCCESS(status) && debugPort != 0) {
-                error(OBF("Debugger attachment detected!"));
+                error("Debugger attachment detected!");
             }
         }
 
@@ -1457,7 +1492,7 @@ INLINE void anti_attach() {
         WCHAR modName[MAX_PATH] = { 0 };
         HANDLE hProcessEx = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
 
-        HMODULE hMod = LoadLibraryA(OBF("ntdll.dll"));
+        HMODULE hMod = LoadLibraryA("ntdll.dll");
         if (hMod) {
             for (int i = 0; i < _countof(funcList); ++i) {
                 funcList[i].addr = GetProcAddress(hMod, funcList[i].name);
@@ -1522,7 +1557,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 }
 
 
-INLINE void check_window_titles() {
+static INLINE void check_window_titles() {
     char exePath[MAX_PATH];
     GetModuleFileNameA(NULL, exePath, MAX_PATH);
     char* exeName = strrchr(exePath, '\\');
@@ -1550,6 +1585,13 @@ INLINE void check_window_titles() {
                 std::transform(lowerTitle.begin(), lowerTitle.end(), lowerTitle.begin(), ::tolower);
                 std::transform(lowerExe.begin(), lowerExe.end(), lowerExe.begin(), ::tolower);
 
+                if (lowerTitle.find(OBF("windows terminal")) != std::string::npos ||
+                    lowerTitle.find(OBF("powershell")) != std::string::npos ||
+                    lowerTitle.find(OBF("cmd")) != std::string::npos ||
+                    lowerTitle.find(OBF("command prompt")) != std::string::npos) {
+                    continue;
+                }
+
                 size_t pos = lowerTitle.rfind(lowerExe);
                 if (pos != std::string::npos && pos + lowerExe.length() == lowerTitle.length()) {
                     DWORD windowPid;
@@ -1559,8 +1601,17 @@ INLINE void check_window_titles() {
                     if (hProcess) {
                         char processName[MAX_PATH];
                         if (GetModuleFileNameExA(hProcess, NULL, processName, MAX_PATH)) {
-                            error(OBF("Suspicious window title detected: ") + window.title + 
+                            // Additional check to avoid false positives with legitimate terminal apps
+                            std::string procNameLower = processName;
+                            std::transform(procNameLower.begin(), procNameLower.end(), procNameLower.begin(), ::tolower);
+                            
+                            if (procNameLower.find(OBF("windowsterminal")) == std::string::npos &&
+                                procNameLower.find(OBF("powershell")) == std::string::npos &&
+                                procNameLower.find(OBF("cmd.exe")) == std::string::npos &&
+                                procNameLower.find(OBF("conhost")) == std::string::npos) {
+                                error(OBF("Suspicious window title detected: ") + window.title + 
                                   OBF(" (Process: ") + processName + OBF(")"));
+                            }
                         }
                         CloseHandle(hProcess);
                     }
@@ -1575,7 +1626,7 @@ INLINE void check_window_titles() {
 
 #define START_ANTI_WINDOW_TITLE std::thread([]() { check_window_titles(); }).detach()
 
-INLINE void junk_threads_protection() {
+static INLINE void junk_threads_protection() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
         
@@ -1607,10 +1658,10 @@ struct ThreadInfo {
     bool isActive;
 };
 
-std::vector<ThreadInfo> protected_threads;
-std::mutex threads_mutex;
+static std::vector<ThreadInfo> protected_threads;
+static std::mutex threads_mutex;
 
-void update_protected_threads() {
+static inline void update_protected_threads() {
     std::lock_guard<std::mutex> lock(threads_mutex);
     
     HANDLE hThreadSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
@@ -1654,7 +1705,7 @@ void update_protected_threads() {
     CloseHandle(hThreadSnap);
 }
 
-INLINE void anti_pause_thread() {
+static INLINE void anti_pause_thread() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
         update_protected_threads();
@@ -1665,7 +1716,7 @@ INLINE void anti_pause_thread() {
                 CONTEXT context = { 0 };
                 context.ContextFlags = CONTEXT_ALL;
 
-                HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+                HMODULE ntdll = GetModuleHandleA(OBF("ntdll.dll"));
                 if (ntdll) {
                     typedef NTSTATUS(NTAPI* pNtQueryInformationThread)(
                         HANDLE ThreadHandle,
@@ -1676,7 +1727,7 @@ INLINE void anti_pause_thread() {
                     );
 
                     auto NtQueryInformationThread = (pNtQueryInformationThread)GetProcAddress(
-                        ntdll, "NtQueryInformationThread");
+                        ntdll, OBF("NtQueryInformationThread"));
 
                     if (NtQueryInformationThread) {
                         ULONG suspendCount = 0;
@@ -1705,7 +1756,7 @@ INLINE void anti_pause_thread() {
     }
 }
 
-INLINE void anti_terminate_thread() {
+static INLINE void anti_terminate_thread() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
         update_protected_threads();
@@ -1744,53 +1795,53 @@ struct ModuleInfo {
     DWORD size;
 };
 
-std::vector<ModuleInfo> legitimate_modules;
-std::mutex modules_mutex;
+static std::vector<ModuleInfo> legitimate_modules;
+static std::mutex modules_mutex;
 
-const std::vector<std::string> system_dlls = {
-    "KERNEL32.DLL",
-    "KERNELBASE.DLL",
-    "NTDLL.DLL",
-    "USER32.DLL",
-    "WIN32U.DLL",
-    "GDI32.DLL",
-    "GDI32FULL.DLL",
-    "ADVAPI32.DLL",
-    "MSVCRT.DLL",
-    "SECHOST.DLL",
-    "RPCRT4.DLL",
-    "CRYPTBASE.DLL",
-    "BCRYPTPRIMITIVES.DLL",
-    "CRYPTSP.DLL",
-    "SSPICLI.DLL",
-    "CRYPT32.DLL",
-    "MSASN1.DLL",
-    "WLDAP32.DLL",
-    "FLTLIB.DLL",
-    "WS2_32.DLL",
-    "OLEAUT32.DLL",
-    "OLE32.DLL",
-    "SHELL32.DLL",
-    "SHLWAPI.DLL",
-    "SETUPAPI.DLL",
-    "CFGMGR32.DLL",
-    "POWRPROF.DLL",
-    "UMPDC.DLL",
-    "VCRUNTIME140.DLL",
-    "VCRUNTIME140_1.DLL",
-    "MSVCP140.DLL",
-    "CONCRT140.DLL",
-    "nvldumdx.dll"
+static const std::vector<std::string> system_dlls = {
+    OBF("KERNEL32.DLL"),
+    OBF("KERNELBASE.DLL"),
+    OBF("NTDLL.DLL"), 
+    OBF("USER32.DLL"),
+    OBF("WIN32U.DLL"),
+    OBF("GDI32.DLL"),
+    OBF("GDI32FULL.DLL"),
+    OBF("ADVAPI32.DLL"),
+    OBF("MSVCRT.DLL"),
+    OBF("SECHOST.DLL"),
+    OBF("RPCRT4.DLL"),
+    OBF("CRYPTBASE.DLL"),
+    OBF("BCRYPTPRIMITIVES.DLL"),
+    OBF("CRYPTSP.DLL"),
+    OBF("SSPICLI.DLL"),
+    OBF("CRYPT32.DLL"),
+    OBF("MSASN1.DLL"),
+    OBF("WLDAP32.DLL"),
+    OBF("FLTLIB.DLL"),
+    OBF("WS2_32.DLL"),
+    OBF("OLEAUT32.DLL"),
+    OBF("OLE32.DLL"),
+    OBF("SHELL32.DLL"),
+    OBF("SHLWAPI.DLL"),
+    OBF("SETUPAPI.DLL"),
+    OBF("CFGMGR32.DLL"),
+    OBF("POWRPROF.DLL"),
+    OBF("UMPDC.DLL"),
+    OBF("VCRUNTIME140.DLL"),
+    OBF("VCRUNTIME140_1.DLL"),
+    OBF("MSVCP140.DLL"),
+    OBF("CONCRT140.DLL"),
+    OBF("nvldumdx.dll")
 };
 
-bool is_system_dll(const std::string& dll_name) {
+static inline bool is_system_dll(const std::string& dll_name) {
     std::string upper_dll_name = dll_name;
     std::transform(upper_dll_name.begin(), upper_dll_name.end(), upper_dll_name.begin(), ::toupper);
     
     return std::find(system_dlls.begin(), system_dlls.end(), upper_dll_name) != system_dlls.end();
 }
 
-bool is_dll_in_system_directory(const std::string& dll_name) {
+static inline bool is_dll_in_system_directory(const std::string& dll_name) {
     char system_dir[MAX_PATH];
     char system32_dir[MAX_PATH];
     
@@ -1811,7 +1862,7 @@ bool is_dll_in_system_directory(const std::string& dll_name) {
     return false;
 }
 
-bool is_main_executable(const std::string& module_name) {
+static inline bool is_main_executable(const std::string& module_name) {
     char exePath[MAX_PATH];
     GetModuleFileNameA(NULL, exePath, MAX_PATH);
     
@@ -1821,7 +1872,7 @@ bool is_main_executable(const std::string& module_name) {
     return _stricmp(module_name.c_str(), exeName) == 0;
 }
 
-bool is_legitimate_module(const std::string& module_name, DWORD64 base_address) {
+static inline bool is_legitimate_module(const std::string& module_name, DWORD64 base_address) {
     if (is_main_executable(module_name)) {
         return true;
     }
@@ -1838,7 +1889,7 @@ bool is_legitimate_module(const std::string& module_name, DWORD64 base_address) 
         });
 }
 
-void initialize_legitimate_modules() {
+static inline void initialize_legitimate_modules() {
     std::lock_guard<std::mutex> lock(modules_mutex);
     legitimate_modules.clear();      
     
@@ -1866,7 +1917,7 @@ void initialize_legitimate_modules() {
     CloseHandle(hModuleSnap);
 }
 
-INLINE void anti_dll_injection() {
+static INLINE void anti_dll_injection() {
     initialize_legitimate_modules();
     
     while (true) {
@@ -1887,7 +1938,7 @@ INLINE void anti_dll_injection() {
                         HMODULE hModule = GetModuleHandleA(moduleName);
                         if (hModule) {
                             HANDLE hProcess = GetCurrentProcess();
-                            LPVOID lpFreeLibrary = (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "FreeLibrary");
+                            LPVOID lpFreeLibrary = (LPVOID)GetProcAddress(GetModuleHandleA(OBF("kernel32.dll")), OBF("FreeLibrary"));
                             
                             if (lpFreeLibrary) {
                                 HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0,
@@ -1921,10 +1972,10 @@ struct CodeSection {
     std::vector<BYTE> originalBytes;
 };
 
-std::vector<CodeSection> protected_sections;
-std::mutex sections_mutex;
+static std::vector<CodeSection> protected_sections;
+static std::mutex sections_mutex;
 
-void initialize_code_protection() {
+static inline void initialize_code_protection() {
     HANDLE hProcess = GetCurrentProcess();
     HMODULE hModule = GetModuleHandle(NULL);
     if (!hModule) return;
@@ -1954,7 +2005,7 @@ void initialize_code_protection() {
     }
 }
 
-INLINE void anti_code_patch() {
+static INLINE void anti_code_patch() {
     initialize_code_protection();
     
     while (true) {
@@ -1989,26 +2040,26 @@ struct ApiFunction {
     std::vector<BYTE> originalBytes;
 };
 
-std::vector<ApiFunction> protected_apis;
-std::mutex apis_mutex;
+static std::vector<ApiFunction> protected_apis;
+static std::mutex apis_mutex;
 
-void initialize_api_protection() {
+static inline void initialize_api_protection() {
     std::lock_guard<std::mutex> lock(apis_mutex);
     protected_apis.clear();
 
     const std::vector<std::pair<std::string, std::string>> critical_apis = {
-        {"kernel32.dll", "VirtualProtect"},
-        {"kernel32.dll", "VirtualAlloc"},
-        {"kernel32.dll", "WriteProcessMemory"},
-        {"kernel32.dll", "CreateRemoteThread"},
-        {"ntdll.dll", "NtCreateThreadEx"},
-        {"ntdll.dll", "NtMapViewOfSection"},
-        {"ntdll.dll", "NtProtectVirtualMemory"},
-        {"ntdll.dll", "LdrLoadDll"},
-        {"user32.dll", "SetWindowsHookEx"},
-        {"kernel32.dll", "LoadLibraryA"},
-        {"kernel32.dll", "LoadLibraryW"},
-        {"kernel32.dll", "GetProcAddress"}
+        {OBF("kernel32.dll"), OBF("VirtualProtect")},
+        {OBF("kernel32.dll"), OBF("VirtualAlloc")},
+        {OBF("kernel32.dll"), OBF("WriteProcessMemory")},
+        {OBF("kernel32.dll"), OBF("CreateRemoteThread")},
+        {OBF("ntdll.dll"), OBF("NtCreateThreadEx")},
+        {OBF("ntdll.dll"), OBF("NtMapViewOfSection")},
+        {OBF("ntdll.dll"), OBF("NtProtectVirtualMemory")},
+        {OBF("ntdll.dll"), OBF("LdrLoadDll")},
+        {OBF("user32.dll"), OBF("SetWindowsHookEx")},
+        {OBF("kernel32.dll"), OBF("LoadLibraryA")},
+        {OBF("kernel32.dll"), OBF("LoadLibraryW")},
+        {OBF("kernel32.dll"), OBF("GetProcAddress")}
     };
 
     for (const auto& api : critical_apis) {
@@ -2030,7 +2081,7 @@ void initialize_api_protection() {
     }
 }
 
-bool is_hook_pattern(const BYTE* bytes) {
+static inline bool is_hook_pattern(const BYTE* bytes) {
     if (bytes[0] == 0xE9) return true;
     if (bytes[0] == 0xFF && bytes[1] == 0x25) return true;
     if (bytes[0] == 0x68 && bytes[5] == 0xC3) return true;
@@ -2039,7 +2090,7 @@ bool is_hook_pattern(const BYTE* bytes) {
     return false;
 }
 
-INLINE void anti_api_hook() {
+static INLINE void anti_api_hook() {
     initialize_api_protection();
     
     while (true) {
@@ -2087,10 +2138,10 @@ struct ImportEntry {
     DWORD64* iatEntry;
 };
 
-std::vector<ImportEntry> protected_imports;
-std::mutex imports_mutex;
+static std::vector<ImportEntry> protected_imports;
+static std::mutex imports_mutex;
 
-void initialize_iat_protection() {
+static inline void initialize_iat_protection() {
     std::lock_guard<std::mutex> lock(imports_mutex);
     protected_imports.clear();
 
@@ -2132,7 +2183,7 @@ void initialize_iat_protection() {
     }
 }
 
-INLINE void anti_iat_hook() {
+static INLINE void anti_iat_hook() {
     initialize_iat_protection();
     
     while (true) {
@@ -2164,10 +2215,10 @@ struct HardwareBreakpoint {
     bool enabled;
 };
 
-std::vector<HardwareBreakpoint> hardware_breakpoints;
-std::mutex breakpoints_mutex;
+static std::vector<HardwareBreakpoint> hardware_breakpoints;
+static std::mutex breakpoints_mutex;
 
-bool check_hardware_breakpoints() {
+static inline bool check_hardware_breakpoints() {
     CONTEXT ctx = { 0 };
     ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
     
@@ -2182,7 +2233,7 @@ bool check_hardware_breakpoints() {
     return false;
 }
 
-bool check_software_breakpoints(const BYTE* start, SIZE_T size) {
+static inline bool check_software_breakpoints(const BYTE* start, SIZE_T size) {
     std::vector<BYTE> buffer(size);
     memcpy(buffer.data(), start, size);
 
@@ -2195,17 +2246,17 @@ bool check_software_breakpoints(const BYTE* start, SIZE_T size) {
     return false;
 }
 
-bool is_blacklisted_process(const std::string& processName) {
+static inline bool is_blacklisted_process(const std::string& processName) {
     const std::vector<std::string> blacklist = {
-        "ollydbg.exe", "x64dbg.exe", "x32dbg.exe", "ida.exe", "ida64.exe",
-        "ghidra.exe", "dnspy.exe", "cheatengine", "processhacker.exe",
-        "httpdebugger.exe", "procmon.exe", "processhacker.exe", "pestudio.exe",
-        "regmon.exe", "filemon.exe", "wireshark.exe", "fiddler.exe",
-        "procexp.exe", "procmon.exe", "immunitydebugger.exe", "windbg.exe",
-        "debugger.exe", "dumpcap.exe", "hookexplorer.exe", "importrec.exe",
-        "petools.exe", "lordpe.exe", "sysinspector.exe", "proc_analyzer.exe",
-        "sysanalyzer.exe", "sniff_hit.exe", "windbg.exe", "apimonitor.exe",
-        "dumpcap.exe", "networktrafficview.exe", "charles.exe", "scylla.exe"
+        OBF("ollydbg.exe"), OBF("x64dbg.exe"), OBF("x32dbg.exe"), OBF("ida.exe"), OBF("ida64.exe"),
+        OBF("ghidra.exe"), OBF("dnspy.exe"), OBF("cheatengine"), OBF("processhacker.exe"),
+        OBF("httpdebugger.exe"), OBF("procmon.exe"), OBF("processhacker.exe"), OBF("pestudio.exe"),
+        OBF("regmon.exe"), OBF("filemon.exe"), OBF("wireshark.exe"), OBF("fiddler.exe"),
+        OBF("procexp.exe"), OBF("procmon.exe"), OBF("immunitydebugger.exe"), OBF("windbg.exe"),
+        OBF("debugger.exe"), OBF("dumpcap.exe"), OBF("hookexplorer.exe"), OBF("importrec.exe"),
+        OBF("petools.exe"), OBF("lordpe.exe"), OBF("sysinspector.exe"), OBF("proc_analyzer.exe"),
+        OBF("sysanalyzer.exe"), OBF("sniff_hit.exe"), OBF("windbg.exe"), OBF("apimonitor.exe"),
+        OBF("dumpcap.exe"), OBF("networktrafficview.exe"), OBF("charles.exe"), OBF("scylla.exe")
     };
 
     std::string lowerName = processName;
@@ -2217,7 +2268,7 @@ bool is_blacklisted_process(const std::string& processName) {
         }) != blacklist.end();
 }
 
-bool check_parent_process() {
+static inline bool check_parent_process() {
     DWORD pid = GetCurrentProcessId();
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapshot == INVALID_HANDLE_VALUE) return false;
@@ -2254,7 +2305,7 @@ bool check_parent_process() {
     return false;
 }
 
-bool check_running_analysis_tools() {
+static inline bool check_running_analysis_tools() {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapshot == INVALID_HANDLE_VALUE) return false;
 
@@ -2279,7 +2330,7 @@ bool check_running_analysis_tools() {
     return found;
 }
 
-INLINE void anti_debug() {
+static INLINE void anti_debug() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
 
@@ -2309,10 +2360,10 @@ struct SehEntry {
     DWORD64 next;
 };
 
-std::vector<SehEntry> protected_seh_entries;
-std::mutex seh_mutex;
+static std::vector<SehEntry> protected_seh_entries;
+static std::mutex seh_mutex;
 
-void initialize_seh_protection() {
+static inline void initialize_seh_protection() {
     std::lock_guard<std::mutex> lock(seh_mutex);
     protected_seh_entries.clear();
 
@@ -2329,7 +2380,7 @@ void initialize_seh_protection() {
     }
 }
 
-bool check_seh_chain() {
+static inline bool check_seh_chain() {
     NT_TIB* tib = (NT_TIB*)NtCurrentTeb();
     if (!tib) return false;
 
@@ -2361,7 +2412,7 @@ bool check_seh_chain() {
     return false;
 }
 
-void protect_against_dump() {
+static inline void protect_against_dump() {
     DWORD oldProtect;
     HANDLE process = GetCurrentProcess();
     HMODULE hModule = GetModuleHandle(NULL);
@@ -2395,7 +2446,7 @@ void protect_against_dump() {
     }
 }
 
-INLINE void anti_dump_and_seh() {
+static INLINE void anti_dump_and_seh() {
     initialize_seh_protection();
     protect_against_dump();
     
@@ -2416,9 +2467,9 @@ INLINE void anti_dump_and_seh() {
                     std::string procName = processName;
                     std::transform(procName.begin(), procName.end(), procName.begin(), ::tolower);
                     
-                    if (procName.find("dumper") != std::string::npos ||
-                        procName.find("dump") != std::string::npos ||
-                        procName.find("memdump") != std::string::npos) {
+                    if (procName.find(OBF("dumper")) != std::string::npos ||
+                        procName.find(OBF("dump")) != std::string::npos ||
+                        procName.find(OBF("memdump")) != std::string::npos) {
                         error(OBF("Critical security violation: Memory dumping tool detected: ") + procName);
                         protect_against_dump();
                     }
@@ -2434,7 +2485,7 @@ INLINE void anti_dump_and_seh() {
 
 #define START_ANTI_DUMP_AND_SEH std::thread([]() { anti_dump_and_seh(); }).detach()
 
-bool IsValidPEHeader(ULONG_PTR BaseAddress)
+static inline bool IsValidPEHeader(ULONG_PTR BaseAddress)
 {
     if (!BaseAddress) return false;
     PIMAGE_DOS_HEADER dosHeader = PIMAGE_DOS_HEADER(BaseAddress);
@@ -2446,7 +2497,7 @@ bool IsValidPEHeader(ULONG_PTR BaseAddress)
     return true;
 }
 
-bool FillPEHeader(ULONG_PTR BaseAddress, PE_HEADER& PEHeader)
+static inline bool FillPEHeader(ULONG_PTR BaseAddress, PE_HEADER& PEHeader)
 {
     if (!IsValidPEHeader(BaseAddress))
         return false;
@@ -2462,7 +2513,7 @@ bool FillPEHeader(ULONG_PTR BaseAddress, PE_HEADER& PEHeader)
     return true;
 }
 
-bool FillRemotePEHeader(HANDLE ProcessHandle, ULONG_PTR BaseAddress, REMOTE_PE_HEADER& PEHeader)
+static inline bool FillRemotePEHeader(HANDLE ProcessHandle, ULONG_PTR BaseAddress, REMOTE_PE_HEADER& PEHeader)
 {
     ZeroMemory(PEHeader.rawData, PE_HEADER_SIZE);
     if (!ReadProcessMemory(ProcessHandle, PVOID(BaseAddress), PEHeader.rawData, PE_HEADER_SIZE, NULL))
@@ -2473,7 +2524,7 @@ bool FillRemotePEHeader(HANDLE ProcessHandle, ULONG_PTR BaseAddress, REMOTE_PE_H
     return true;
 }
 
-const PIMAGE_SECTION_HEADER GetPeSectionByName(const PE_HEADER& HeaderData, const char* SectionName)
+static inline const PIMAGE_SECTION_HEADER GetPeSectionByName(const PE_HEADER& HeaderData, const char* SectionName)
 {
     for (auto section : HeaderData.sectionHeaders)
         if (!strncmp(PCHAR(section->Name), SectionName, 8))
@@ -2481,7 +2532,7 @@ const PIMAGE_SECTION_HEADER GetPeSectionByName(const PE_HEADER& HeaderData, cons
     return 0;
 }
 
-DWORD GetSizeOfImage(PVOID BaseAddress)
+static inline DWORD GetSizeOfImage(PVOID BaseAddress)
 {
     if (!IsValidPEHeader(ULONG_PTR(BaseAddress)))
         return 0;
@@ -2490,35 +2541,35 @@ DWORD GetSizeOfImage(PVOID BaseAddress)
 
 #define CHECK_PE_HEADER(BaseAddress, ErrorMsg) \
     if (!IsValidPEHeader(BaseAddress)) { \
-        error(OBF(ErrorMsg)); \
+        error(ErrorMsg); \
         return false; \
     }
 
 #define CHECK_PE_SECTION(Section, SectionName, ErrorMsg) \
     if (!GetPeSectionByName(Section, SectionName)) { \
-        error(OBF(ErrorMsg)); \
+        error(ErrorMsg); \
         return false; \
     }
 
 #define VERIFY_PE_STRUCTURE(PEHeader, ErrorMsg) \
     if (!PEHeader.dosHeader || !PEHeader.ntHeaders || !PEHeader.fileHeader || !PEHeader.optionalHeader) { \
-        error(OBF(ErrorMsg)); \
+        error(ErrorMsg); \
         return false; \
     }
 
 #define CHECK_REMOTE_PE(ProcessHandle, BaseAddress, ErrorMsg) \
     if (!ProcessHandle || !BaseAddress) { \
-        error(OBF(ErrorMsg)); \
+        error(ErrorMsg); \
         return false; \
     }
 
-bool VerifyModule(HMODULE hModule) {
+static inline bool VerifyModule(HMODULE hModule) {
     CHECK_PE_HEADER((ULONG_PTR)hModule, "Module PE header is invalid or corrupted");
     
     return true;
 }
 
-bool VerifyCodeSection(HMODULE hModule) {
+static inline bool VerifyCodeSection(HMODULE hModule) {
     PE_HEADER peHeader;
     
     CHECK_PE_HEADER((ULONG_PTR)hModule, "Invalid PE structure detected");
@@ -2532,7 +2583,7 @@ bool VerifyCodeSection(HMODULE hModule) {
     return true;
 }
 
-bool PerformFullCheck(HMODULE hModule) {
+static inline bool PerformFullCheck(HMODULE hModule) {
     PE_HEADER peHeader;
     
     CHECK_PE_HEADER((ULONG_PTR)hModule, "Invalid PE header");
@@ -2549,7 +2600,7 @@ bool PerformFullCheck(HMODULE hModule) {
     return true;
 }
 
-void RunProtection() {
+INLINE static void RunProtection() {
     HMODULE hModule = GetModuleHandle(NULL);
     
     try {
@@ -2565,7 +2616,7 @@ void RunProtection() {
             return;
         }
     } catch (...) {
-        error(OBF("Critical protection failure"));
+        error("Critical protection failure");
     }
 }
 
@@ -2765,27 +2816,6 @@ void RunProtection() {
         } \
     }
 
-#define INIT_PROTECTION \
-    JUNK_FUCK_IDA; \
-    protect_code(); \
-    START_INTEGRITY_CHECK; \
-    START_ANTI_ATTACH; \
-    START_ANTI_WINDOW_TITLE; \
-    START_JUNK_THREADS; \
-    START_ANTI_PAUSE_THREAD; \
-    START_ANTI_TERMINATE_THREAD; \
-    START_ANTI_DLL_INJECTION; \
-    START_ANTI_CODE_PATCH; \
-    START_ANTI_API_HOOK; \
-    START_ANTI_IAT_HOOK; \
-    START_ANTI_DEBUG; \
-    START_ANTI_DUMP_AND_SEH; \
-    START_ANTI_REVERSE_FILES; \
-    START_ANTI_NETWORK_ANALYSIS; \
-    START_ANTI_VM_ADVANCED; \
-    START_ANTI_INSTRUMENTATION; \
-    JUNK_FUCK_IDA
-
 #define PROTECT_CRITICAL_SECTION(code) \
     [&]() { \
         ULTRA_MEGA_JUNK(0); \
@@ -2823,13 +2853,13 @@ void RunProtection() {
                         std::string procName = processName; \
                         std::transform(procName.begin(), procName.end(), procName.begin(), ::tolower); \
                         \
-                        if (procName.find("python") != std::string::npos || \
-                            procName.find("pyqt") != std::string::npos || \
-                            procName.find("pyside") != std::string::npos || \
-                            procName.find("qt5core") != std::string::npos || \
-                            procName.find("qt6core") != std::string::npos || \
-                            procName.find("qtcore") != std::string::npos || \
-                            procName.find("qtwidgets") != std::string::npos) { \
+                        if (procName.find(OBF("python")) != std::string::npos || \
+                            procName.find(OBF("pyqt")) != std::string::npos || \
+                            procName.find(OBF("pyside")) != std::string::npos || \
+                            procName.find(OBF("qt5core")) != std::string::npos || \
+                            procName.find(OBF("qt6core")) != std::string::npos || \
+                            procName.find(OBF("qtcore")) != std::string::npos || \
+                            procName.find(OBF("qtwidgets")) != std::string::npos) { \
                             \
                             HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID); \
                             if (hProcess != NULL) { \
@@ -2849,21 +2879,21 @@ void RunProtection() {
 #define KILL_PYQT_APPS \
     std::thread([&]() { \
         const std::vector<std::string> qt_dlls = { \
-            "python", "pyqt", "pyside", \
-            "qt5core", "qt6core", "qtcore", "qtwidgets", \
-            "qt5gui", "qt6gui", "qtgui", \
-            "qt5widgets", "qt6widgets", \
-            "qt5network", "qt6network", \
-            "sip", "pyqt5", "pyqt6", "pyside2", "pyside6", \
-            "qt5qml", "qt6qml", "qtqml", \
-            "qt5quick", "qt6quick", "qtquick", \
-            "qt5webengine", "qt6webengine", \
-            "qt5webkit", "qt6webkit", \
-            "qt5multimedia", "qt6multimedia", \
-            "python3", "python2", "pythonw", \
-            "qt5printsupport", "qt6printsupport", \
-            "qt5svg", "qt6svg", \
-            "qt5charts", "qt6charts" \
+            OBF("python"), OBF("pyqt"), OBF("pyside"), \
+            OBF("qt5core"), OBF("qt6core"), OBF("qtcore"), OBF("qtwidgets"), \
+            OBF("qt5gui"), OBF("qt6gui"), OBF("qtgui"), \
+            OBF("qt5widgets"), OBF("qt6widgets"), \
+            OBF("qt5network"), OBF("qt6network"), \
+            OBF("sip"), OBF("pyqt5"), OBF("pyqt6"), OBF("pyside2"), OBF("pyside6"), \
+            OBF("qt5qml"), OBF("qt6qml"), OBF("qtqml"), \
+            OBF("qt5quick"), OBF("qt6quick"), OBF("qtquick"), \
+            OBF("qt5webengine"), OBF("qt6webengine"), \
+            OBF("qt5webkit"), OBF("qt6webkit"), \
+            OBF("qt5multimedia"), OBF("qt6multimedia"), \
+            OBF("python3"), OBF("python2"), OBF("pythonw"), \
+            OBF("qt5printsupport"), OBF("qt6printsupport"), \
+            OBF("qt5svg"), OBF("qt6svg"), \
+            OBF("qt5charts"), OBF("qt6charts") \
         }; \
         \
         while (true) { \
@@ -2922,20 +2952,45 @@ INLINE bool detect_hypervisor() {
     return (cpuInfo[2] & (1 << 31)) != 0;
 }
 
+INLINE bool detect_low_ram() {
+    MEMORYSTATUSEX memInfo;
+    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+    if (GlobalMemoryStatusEx(&memInfo)) {
+        DWORDLONG totalRAM = memInfo.ullTotalPhys / (1024 * 1024 * 1024);
+        return totalRAM < 4;
+    }
+    return false;
+}
+
+INLINE bool detect_few_cores() {
+    SYSTEM_INFO sysInfo;
+    GetSystemInfo(&sysInfo);
+    return sysInfo.dwNumberOfProcessors < 4; 
+}
+
+INLINE bool detect_low_disk_space() {
+    ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;
+    if (GetDiskFreeSpaceExA(OBF("C:\\"), &freeBytesAvailable, &totalBytes, &totalFreeBytes)) {
+        ULONGLONG totalGB = totalBytes.QuadPart / (1024 * 1024 * 1024);
+        return totalGB < 100;
+    }
+    return false;
+}
+
 INLINE bool detect_vm() {
     bool vm = false;
 
     const char* vm_vendors[] = {
-        "VMware",
-        "VBox",
-        "VIRTUAL",
-        "QEMU",
-        "Xen",
-        "Parallels"
+        OBF("VMware"),
+        OBF("VBox"),
+        OBF("VIRTUAL"),
+        OBF("QEMU"),
+        OBF("Xen"),
+        OBF("Parallels")
     };
 
     HKEY hKey;
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, OBF("SYSTEM\\CurrentControlSet\\Services"), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
         char keyName[256];
         DWORD index = 0;
         DWORD nameSize = sizeof(keyName);
@@ -2956,12 +3011,24 @@ INLINE bool detect_vm() {
     return vm;
 }
 
-INLINE void anti_vm() {
+static INLINE void anti_vm() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
 
         if (detect_hypervisor() || detect_vm()) {
             error(OBF("Virtual Machine detected!"));
+        }
+
+        if (detect_low_ram()) {
+            error(OBF("Suspicious low RAM configuration detected!"));
+        }
+
+        if (detect_few_cores()) {
+            error(OBF("Suspicious low CPU core count detected!"));
+        }
+
+        if (detect_low_disk_space()) {
+            error(OBF("Suspicious low disk space detected!"));
         }
 
         CALL_RANDOM_JUNK;
@@ -2971,7 +3038,7 @@ INLINE void anti_vm() {
 
 #define START_ANTI_VM std::thread([]() { anti_vm(); }).detach()
 
-INLINE void protect_memory_regions() {
+static INLINE void protect_memory_regions() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
 
@@ -3007,19 +3074,19 @@ struct SystemCall {
     BYTE originalBytes[16];
 };
 
-std::vector<SystemCall> protected_syscalls;
-std::mutex syscalls_mutex;
+static std::vector<SystemCall> protected_syscalls;
+static std::mutex syscalls_mutex;
 
-INLINE void protect_system_calls() {
+static INLINE void protect_system_calls() {
     const char* critical_syscalls[] = {
-        "NtCreateFile",
-        "NtOpenFile",
-        "NtReadFile",
-        "NtWriteFile",
-        "NtDeviceIoControlFile",
-        "NtQuerySystemInformation",
-        "NtQueryInformationProcess",
-        "NtSetInformationProcess"
+        OBF("NtCreateFile"),
+        OBF("NtOpenFile"),
+        OBF("NtReadFile"),
+        OBF("NtWriteFile"),
+        OBF("NtDeviceIoControlFile"),
+        OBF("NtQuerySystemInformation"),
+        OBF("NtQueryInformationProcess"),
+        OBF("NtSetInformationProcess")
     };
 
     HMODULE ntdll = GetModuleHandleA("ntdll.dll");
@@ -3063,10 +3130,10 @@ struct ApcContext {
     DWORD threadId;
 };
 
-std::vector<ApcContext> legitimate_apcs;
-std::mutex apc_mutex;
+static std::vector<ApcContext> legitimate_apcs;
+static std::mutex apc_mutex;
 
-INLINE void anti_apc_injection() {
+static INLINE void anti_apc_injection() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
 
@@ -3148,13 +3215,13 @@ struct GdtEntry {
     BYTE flags;
 };
 
-std::vector<GdtEntry> original_gdt;
-std::mutex gdt_mutex;
+static std::vector<GdtEntry> original_gdt;
+static std::mutex gdt_mutex;
 
 extern "C" void _sgdt(void*);
 #pragma intrinsic(_sgdt)
 
-INLINE void protect_gdt() {
+static INLINE void protect_gdt() {
     GDT_DESCRIPTOR gdtr = { 0 };
     _sgdt(&gdtr);
 
@@ -3242,10 +3309,10 @@ struct DebugRegisterState {
     DWORD64 dr7;
 };
 
-std::vector<DebugRegisterState> thread_debug_states;
-std::mutex debug_reg_mutex;
+static std::vector<DebugRegisterState> thread_debug_states;
+static std::mutex debug_reg_mutex;
 
-INLINE void protect_debug_registers() {
+static INLINE void protect_debug_registers() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
 
@@ -3306,10 +3373,10 @@ struct IDT_ENTRY {
 };
 #pragma pack(pop)
 
-std::vector<IDT_ENTRY> original_idt;
-std::mutex idt_mutex;
+static std::vector<IDT_ENTRY> original_idt;
+static std::mutex idt_mutex;
 
-INLINE void protect_idt() {
+static INLINE void protect_idt() {
     IDT_DESCRIPTOR idtr = { 0 };
     __sidt(&idtr);
 
@@ -3356,10 +3423,10 @@ struct PageEntry {
     std::vector<BYTE> content;
 };
 
-std::vector<PageEntry> protected_pages;
-std::mutex page_mutex;
+static std::vector<PageEntry> protected_pages;
+static std::mutex page_mutex;
 
-INLINE void protect_pages() {
+static INLINE void protect_pages() {
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
 
@@ -3410,14 +3477,14 @@ struct KernelCallback {
     BYTE originalBytes[32];
 };
 
-std::vector<KernelCallback> protected_callbacks;
-std::mutex callback_mutex;
+static std::vector<KernelCallback> protected_callbacks;
+static std::mutex callback_mutex;
 
-INLINE void protect_kernel_callbacks() {
+static INLINE void protect_kernel_callbacks() {
     const PVOID callbacks[] = {
-        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserExceptionDispatcher"),
-        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserApcDispatcher"),
-        GetProcAddress(GetModuleHandleA("ntdll.dll"), "KiUserCallbackDispatcher")
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), OBF("KiUserExceptionDispatcher")),
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), OBF("KiUserApcDispatcher")),
+        GetProcAddress(GetModuleHandleA("ntdll.dll"), OBF("KiUserCallbackDispatcher"))
     };
 
     for (PVOID callback : callbacks) {
@@ -3461,8 +3528,8 @@ struct LibraryInfo {
     std::vector<BYTE> codeHash;
 };
 
-std::vector<LibraryInfo> protected_libraries;
-std::mutex libraries_mutex;
+static std::vector<LibraryInfo> protected_libraries;
+static std::mutex libraries_mutex;
 
 namespace fake_auth {
     static const char* const auth_urls[] = {
@@ -3837,7 +3904,7 @@ namespace fake_auth {
     };
 }
 
-INLINE void refresh_fake_auth() {
+static INLINE void refresh_fake_auth() {
     while (true) {
         int url_idx = rand() % (sizeof(fake_auth::auth_urls) / sizeof(fake_auth::auth_urls[0]));
         int token_idx = rand() % (sizeof(fake_auth::fake_tokens) / sizeof(fake_auth::fake_tokens[0]));
@@ -3973,7 +4040,7 @@ namespace crash_strings {
         } \
     }).detach()
 
-INLINE void anti_reverse_files() {
+static INLINE void anti_reverse_files() {
     char exePath[MAX_PATH];
     char exeName[MAX_PATH];
     char searchPath[MAX_PATH];
@@ -3999,7 +4066,7 @@ INLINE void anti_reverse_files() {
         ULTRA_MEGA_JUNK(0);
         
         const char* idaExtensions[] = {
-            ".i64", ".idb", ".id0", ".id1", ".id2", ".nam", ".til"
+            OBF(".i64"), OBF(".idb"), OBF(".id0"), OBF(".id1"), OBF(".id2"), OBF(".nam"), OBF(".til")
         };
         
         for (const auto& ext : idaExtensions) {
@@ -4017,7 +4084,7 @@ INLINE void anti_reverse_files() {
         }
         
         const char* ghidraExtensions[] = {
-            ".gpr", ".rep", ".gbf", ".gdf"
+            OBF(".gpr"), OBF(".rep"), OBF(".gbf"),OBF(".gdf")
         };
         
         for (const auto& ext : ghidraExtensions) {
@@ -4044,7 +4111,7 @@ INLINE void anti_reverse_files() {
         }
         
         const char* exportExtensions[] = {
-            ".dif", ".lst", ".map", ".sym"
+            OBF(".dif"), OBF(".lst"), OBF(".map"), OBF(".sym")
         };
         
         for (const auto& ext : exportExtensions) {
@@ -4069,7 +4136,7 @@ INLINE void anti_reverse_files() {
         }
         
         const char* debuggerExtensions[] = {
-            ".dd32", ".dd64", ".udd", ".dbg"
+            OBF(".dd32"), OBF(".dd64"), OBF(".udd"), OBF(".dbg")
         };
         
         for (const auto& ext : debuggerExtensions) {
@@ -4082,12 +4149,12 @@ INLINE void anti_reverse_files() {
             
             sprintf_s(searchFile, "%s%s%s", searchPath, exeName, ext);
             if (GetFileAttributesA(searchFile) != INVALID_FILE_ATTRIBUTES) {
-                error(OBF("Debugger database file for this executable detected: ") + std::string(searchFile));
+                error("Debugger database file for this executable detected: " + std::string(searchFile));
             }
         }
         
         const char* disasmExtensions[] = {
-            ".asm", ".disasm", ".s", ".lst"
+            OBF(".asm"), OBF(".disasm"), OBF(".s"), OBF(".lst")
         };
         
         for (const auto& ext : disasmExtensions) {
@@ -4118,17 +4185,18 @@ INLINE void anti_reverse_files() {
 
 #define START_ANTI_REVERSE_FILES std::thread([]() { anti_reverse_files(); }).detach()
 
-INLINE void anti_network_analysis() {
+static INLINE void anti_network_analysis() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
         
-        const char* networkAnalysisTools[] = {
+        static const char* networkAnalysisTools[] = {
             OBF("wireshark.exe"), OBF("fiddler.exe"), OBF("burpsuite.exe"), OBF("burp.exe"), OBF("charles.exe"),
             OBF("intercepter-ng.exe"), OBF("httpdebugger.exe"), OBF("httpanalyzer.exe"), OBF("telerik fiddler"),
             OBF("proxifier.exe"), OBF("mitmproxy.exe"), OBF("networkmonitor.exe"), OBF("netmon.exe"),
             OBF("smartsniff.exe"),OBF("ethereal.exe"), OBF("ettercap.exe"),OBF("tcpdump.exe"), OBF("dumpcap.exe"),
             OBF("packetmon.exe"),OBF("netwitness.exe"),OBF("capsa.exe"), OBF("omnipeek.exe"),OBF("proxycap.exe")
         };
+        static const size_t networkAnalysisToolsCount = sizeof(networkAnalysisTools) / sizeof(networkAnalysisTools[0]);
         
         HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
         if (snapshot != INVALID_HANDLE_VALUE) {
@@ -4142,7 +4210,8 @@ INLINE void anti_network_analysis() {
                     std::string procNameLower = processName;
                     std::transform(procNameLower.begin(), procNameLower.end(), procNameLower.begin(), ::tolower);
                     
-                    for (const auto& tool : networkAnalysisTools) {
+                    for (size_t i = 0; i < networkAnalysisToolsCount; ++i) {
+                        const char* tool = networkAnalysisTools[i];
                         std::string toolLower = tool;
                         std::transform(toolLower.begin(), toolLower.end(), toolLower.begin(), ::tolower);
                         
@@ -4179,7 +4248,7 @@ INLINE void anti_network_analysis() {
             RegCloseKey(hKey);
         }
         
-        HCERTSTORE hStore = CertOpenSystemStoreA(0, "ROOT");
+        HCERTSTORE hStore = CertOpenSystemStoreA(0, OBF("ROOT"));
         if (hStore) {
             PCCERT_CONTEXT pCertContext = NULL;
             while (pCertContext = CertEnumCertificatesInStore(hStore, pCertContext)) {
@@ -4193,7 +4262,9 @@ INLINE void anti_network_analysis() {
                     std::string certNameLower = certName;
                     std::transform(certNameLower.begin(), certNameLower.end(), certNameLower.begin(), ::tolower);
                     
-                    for (const auto& cert : suspiciousCerts) {
+                    const size_t suspiciousCertsCount = sizeof(suspiciousCerts) / sizeof(suspiciousCerts[0]);
+                    for (size_t i = 0; i < suspiciousCertsCount; ++i) {
+                        const char* cert = suspiciousCerts[i];
                         std::string certLower = cert;
                         std::transform(certLower.begin(), certLower.end(), certLower.begin(), ::tolower);
                         
@@ -4240,7 +4311,9 @@ INLINE bool check_vm_registry_keys() {
         OBF("HARDWARE\\DESCRIPTION\\System\\BIOS\\SystemManufacturer")
     };
     
-    for (const auto& key : vmRegistryKeys) {
+    const size_t vmRegistryKeysCount = sizeof(vmRegistryKeys) / sizeof(vmRegistryKeys[0]);
+    for (size_t i = 0; i < vmRegistryKeysCount; ++i) {
+        const char* key = vmRegistryKeys[i];
         HKEY hKey;
         if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
             RegCloseKey(hKey);
@@ -4275,7 +4348,9 @@ INLINE bool check_vm_files() {
         OBF("C:\\windows\\system32\\VMwareTray.exe")
     };
     
-    for (const auto& file : vmFiles) {
+    const size_t vmFilesCount = sizeof(vmFiles) / sizeof(vmFiles[0]);
+    for (size_t i = 0; i < vmFilesCount; ++i) {
+        const char* file = vmFiles[i];
         if (GetFileAttributesA(file) != INVALID_FILE_ATTRIBUTES) {
             return true;
         }
@@ -4306,7 +4381,9 @@ INLINE bool check_vm_processes() {
             std::string procNameLower = processName;
             std::transform(procNameLower.begin(), procNameLower.end(), procNameLower.begin(), ::tolower);
             
-            for (const auto& vmProc : vmProcesses) {
+            const size_t vmProcessesCount = sizeof(vmProcesses) / sizeof(vmProcesses[0]);
+            for (size_t i = 0; i < vmProcessesCount; ++i) {
+                const char* vmProc = vmProcesses[i];
                 std::string vmProcLower = vmProc;
                 std::transform(vmProcLower.begin(), vmProcLower.end(), vmProcLower.begin(), ::tolower);
                 
@@ -4322,7 +4399,7 @@ INLINE bool check_vm_processes() {
     return false;
 }
 
-INLINE void anti_vm_advanced() {
+static INLINE void anti_vm_advanced() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
         
@@ -4344,7 +4421,7 @@ INLINE void anti_vm_advanced() {
             error(OBF("VirtualBox device detected!"));
         }
         
-        hDevice = CreateFileA(OBF("\\\\.\\vmci"), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+        hDevice = CreateFileA("\\\\.\\vmci", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
         if (hDevice != INVALID_HANDLE_VALUE) {
             CloseHandle(hDevice);
             error(OBF("VMware device detected!"));
@@ -4398,7 +4475,7 @@ INLINE void anti_vm_advanced() {
 
 #define START_ANTI_VM_ADVANCED std::thread([]() { anti_vm_advanced(); }).detach()
 
-INLINE void anti_instrumentation() {
+static INLINE void anti_instrumentation() {
     while (true) {
         ULTRA_MEGA_JUNK(0);
         
@@ -4546,3 +4623,30 @@ INLINE void anti_instrumentation() {
 }
 
 #define START_ANTI_INSTRUMENTATION std::thread([]() { anti_instrumentation(); }).detach()
+
+namespace CallSpoofer
+{
+    class SpoofFunction
+    {
+    public:
+        uintptr_t temp = 0;
+        const uintptr_t xor_key = 0xff00ff00ff00ff00;
+        void* ret_addr_in_stack = 0;
+
+        SpoofFunction(void* addr) : ret_addr_in_stack(addr)
+        {
+            temp = *(uintptr_t*)ret_addr_in_stack;
+            temp ^= xor_key;
+            *(uintptr_t*)ret_addr_in_stack = 0;
+        }
+        ~SpoofFunction()
+        {
+            temp ^= xor_key;
+            *(uintptr_t*)ret_addr_in_stack = temp;
+        }
+    };
+}
+
+#define SPOOF_FUNC CallSpoofer::SpoofFunction spoof(_AddressOfReturnAddress());
+
+#endif // SRUNGOAT_H
