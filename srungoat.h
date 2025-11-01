@@ -9,6 +9,7 @@
 #include <random>
 #include <ctime>
 #include <windows.h>
+#include <wincrypt.h>
 #include <lmcons.h>
 #include <winternl.h>
 #include <psapi.h>
