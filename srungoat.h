@@ -4650,4 +4650,110 @@ namespace CallSpoofer
 
 #define SPOOF_FUNC CallSpoofer::SpoofFunction spoof(_AddressOfReturnAddress());
 
+
+static auto obfuscate_pe_header() -> void
+{
+    __try
+    {
+        auto base = reinterpret_cast<std::uintptr_t>(GetModuleHandle(nullptr));
+        auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(base);
+        if (dos_header->e_magic != IMAGE_DOS_SIGNATURE) return;
+
+        auto nt_headers = reinterpret_cast<PIMAGE_NT_HEADERS>(base + dos_header->e_lfanew);
+        if (nt_headers->Signature != IMAGE_NT_SIGNATURE) return;
+
+        DWORD old_protect;
+        if (VirtualProtect(nt_headers, sizeof(IMAGE_NT_HEADERS), PAGE_READWRITE, &old_protect))
+        {
+            // Confuse dumpers that iterate sections
+            nt_headers->FileHeader.NumberOfSections = 0;
+            
+            // Confuse tools relying on image size
+            nt_headers->OptionalHeader.SizeOfImage = 0x10000000;
+
+            // Wipe critical data directories used by dumpers
+            nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress = 0;
+            nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size = 0;
+
+            nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = 0;
+            nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size = 0;
+
+            nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress = 0;
+            nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG].Size = 0;
+
+            VirtualProtect(nt_headers, sizeof(IMAGE_NT_HEADERS), old_protect, &old_protect);
+        }
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER) {}
+}
+
+static auto destroy_import_names() -> void
+{
+    __try
+    {
+        auto base = reinterpret_cast<std::uintptr_t>(GetModuleHandle(nullptr));
+        auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(base);
+        if (dos_header->e_magic != IMAGE_DOS_SIGNATURE) return;
+        
+        auto nt_headers = reinterpret_cast<PIMAGE_NT_HEADERS>(base + dos_header->e_lfanew);
+        if (nt_headers->Signature != IMAGE_NT_SIGNATURE) return;
+        
+        auto import_dir = &nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+        if (import_dir->VirtualAddress == 0) return;
+        
+        auto import_desc = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(base + import_dir->VirtualAddress);
+        
+        while (import_desc->Name)
+        {
+            auto dll_name = reinterpret_cast<char*>(base + import_desc->Name);
+            DWORD old_protect;
+            if (VirtualProtect(dll_name, strlen(dll_name), PAGE_READWRITE, &old_protect))
+            {
+                memset(dll_name, 0, strlen(dll_name));
+                VirtualProtect(dll_name, strlen(dll_name), old_protect, &old_protect);
+            }
+            ++import_desc;
+        }
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER) {}
+}
+
+static auto erase_section_names() -> void
+{
+    __try
+    {
+        auto base = reinterpret_cast<std::uintptr_t>(GetModuleHandle(nullptr));
+        auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(base);
+        if (dos_header->e_magic != IMAGE_DOS_SIGNATURE) return;
+        
+        auto nt_headers = reinterpret_cast<PIMAGE_NT_HEADERS>(base + dos_header->e_lfanew);
+        if (nt_headers->Signature != IMAGE_NT_SIGNATURE) return;
+        
+        auto section_header = IMAGE_FIRST_SECTION(nt_headers);
+        
+        for (int i = 0; i < nt_headers->FileHeader.NumberOfSections; i++)
+        {
+            DWORD old_protect;
+            if (VirtualProtect(&section_header[i].Name, IMAGE_SIZEOF_SHORT_NAME, PAGE_READWRITE, &old_protect))
+            {
+                memset(section_header[i].Name, 0, IMAGE_SIZEOF_SHORT_NAME);
+                VirtualProtect(&section_header[i].Name, IMAGE_SIZEOF_SHORT_NAME, old_protect, &old_protect);
+            }
+        }
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER) {}
+}
+
+static INLINE void anti_dump_pe() {
+    std::thread([](){
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        obfuscate_pe_header();
+        destroy_import_names();
+        erase_section_names();
+    }).detach();
+}
+
+#define ANTI_DUMP_PE anti_dump_pe()
+
+
 #endif // SRUNGOAT_H
