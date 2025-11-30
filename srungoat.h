@@ -39,8 +39,8 @@
 
 // This protection is under Custom License – Non-Commercial Source Distribution
 // Copyright (c) 2025 srungot
-// Discord: https://discord.gg/denuvo
-// Discord Username: 0x61d
+// Discord: https://discord.com/users/483948013547683861 | 322891079646969856
+// Discord Username: 0x61d | yeahimnizzix
 
 // Credits:
 // - https://github.com/ac3ss0r/obfusheader.h/tree/main - Thank you ac3ss0r for the base of fake signatures
