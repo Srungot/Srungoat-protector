@@ -4150,7 +4150,7 @@ static INLINE void anti_reverse_files() {
             
             sprintf_s(searchFile, "%s%s%s", searchPath, exeName, ext);
             if (GetFileAttributesA(searchFile) != INVALID_FILE_ATTRIBUTES) {
-                error("Debugger database file for this executable detected: " + std::string(searchFile));
+                error(OBF("Debugger database file for this executable detected: ") + std::string(searchFile));
             }
         }
         
